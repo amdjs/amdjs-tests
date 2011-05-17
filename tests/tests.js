@@ -15,11 +15,12 @@
         basic: function () {
             reg('basic/defineAmd');
             reg('basic/simple');
+            reg('basic/circular');
         }
 
-        //basic: true, //include function callback and basic object callback.
-        //simple circular dependencies
-        //anonymous: true, //include function callback and basic object callback.
+        //basic: true, //include require, exports, module tests.
+        //anonymous: true, //include function callback and basic object callback,
+           //circular deps
         //commonJsWrapper: true,
 
     };
