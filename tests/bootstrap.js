@@ -5,6 +5,7 @@
     var args = location.search.substring(1),
         parts = args.split('&'),
         dohPath = location.href,
+        pathRegExp = /\.\.|:|\/\//,
         html = '',
         i, part;
 
@@ -24,8 +25,16 @@
         html += '<' + 'script src="' + path + '"></' + 'script>';
     }
 
-    write(args.impl);
-    write(args.config);
+    //Only allow impl and config args that do not have relative paths
+    //or protocols. Do this to avoid injection attacks on domains that
+    //host the test files.
+    if (pathRegExp.test(args.impl) || pathRegExp.test(args.config)) {
+        alert('invalid impl or config path');
+        return;
+    }
+
+    write('../../impl/' + args.impl);
+    write('../../impl/' + args.config);
 
     if (location.href.indexOf('doh/runner.html') === -1) {
         write(dohPath + 'runner.js');

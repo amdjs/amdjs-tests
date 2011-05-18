@@ -29,7 +29,7 @@
         },
 
         funcString: function () {
-            reg('funcString/funcString')
+            reg('funcString/funcString');
         }
 
 
