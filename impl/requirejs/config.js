@@ -8,5 +8,7 @@ var config = require,
     //Indicate what levels of the API are implemented by this loader,
     //and therefore which tests to run.
     implemented = {
-        basic: true
+        basic: true,
+        anon: true,
+        funcString: true
     };

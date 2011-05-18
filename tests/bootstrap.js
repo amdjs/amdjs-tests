@@ -1,3 +1,6 @@
+/*jslint strict: false, plusplus: false, evil: true */
+/*global document: false, location: false */
+
 (function () {
     var args = location.search.substring(1),
         parts = args.split('&'),
@@ -18,7 +21,7 @@
     dohPath = dohPath.substring(0, i + 1) + 'tests/doh/';
 
     function write(path) {
-        html += '<script src="' + path + '"><\/\script>';
+        html += '<' + 'script src="' + path + '"></' + 'script>';
     }
 
     write(args.impl);
