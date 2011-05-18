@@ -10,9 +10,8 @@ function(require,   two,   funcTwo,   funcThree) {
                 function circular(t) {
                     t.is("small", args.size);
                     t.is("redtwo", args.color);
-                    //Check CommonJS "module" property support.
-                    t.is("one", oneMod.name);
-                    t.is("one.js", oneMod.uri);
+                    //Check CommonJS "module.id" property support.
+                    t.is("one", oneMod.id);
                 }
             ]
         );
