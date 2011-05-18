@@ -6,7 +6,8 @@
         levelNames = [
             'basic',
             'anon',
-            'funcString'
+            'funcString',
+            'plugins'
         ],
         i, levels, name;
 
@@ -30,6 +31,12 @@
 
         funcString: function () {
             reg('funcString/funcString');
+        },
+
+        plugins: function () {
+            reg('plugins/double');
+            reg('plugins/fromText');
+            reg('plugins/normalize');
         }
 
 

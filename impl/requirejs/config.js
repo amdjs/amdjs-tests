@@ -10,5 +10,6 @@ var config = require,
     implemented = {
         basic: true,
         anon: true,
-        funcString: true
+        funcString: true,
+        plugins: true
     };
