@@ -11,5 +11,7 @@ var config = require,
         basic: true,
         anon: true,
         funcString: true,
+        require: true,
+        globalRequireConfig: true,
         plugins: true
     };

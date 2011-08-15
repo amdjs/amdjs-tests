@@ -7,6 +7,8 @@
             'basic',
             'anon',
             'funcString',
+            'require',
+            'globalRequireConfig',
             'plugins'
         ],
         i, levels, name;
@@ -31,6 +33,14 @@
 
         funcString: function () {
             reg('funcString/funcString');
+        },
+
+        require: function () {
+            reg('require/basic');
+        },
+
+        globalRequireConfig: function () {
+            reg('globalRequireConfig/basic');
         },
 
         plugins: function () {

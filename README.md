@@ -58,6 +58,23 @@ get out dependencies. Used to support simplified module wrapping:
     });
 ```
 
+## require
+
+Basic require() support, in accordance with the [amdjs require API](https://github.com/amdjs/amdjs-api/wiki/require):
+
+* require(String)
+* require(Array, Function)
+* require.toUrl(String)
+
+## globalRequireConfig
+
+Tests a global require.config() function, as specified in the
+[amdjs require API](https://github.com/amdjs/amdjs-api/wiki/require#wiki-globalConfig). Just ensures
+the method exists, does not throw an error when given an object, and
+that a function is returned from the call.
+
+Support for this test is not required for any of the other tests to pass.
+
 ## plugins
 
 Support for loader plugins.
@@ -70,12 +87,12 @@ Support for loader plugins.
 
 Run the tests through a web server. The URL should look like the following:
 
-    http://127.0.0.1/amd-tests/tests/doh/runner.html?config=path/to/config.js&impl=path/to/loader.js
+    http://127.0.0.1/amdjs-tests/tests/doh/runner.html?config=path/to/config.js&impl=path/to/loader.js
 
 Where both the config and impl paths are paths that are inside the **impl** directory in this project.
 
 To run the tests using the version of RequireJS in this repository:
 
-    http://127.0.0.1/amd-tests/tests/doh/runner.html?config=requirejs/config.js&impl=requirejs/require.js
+    http://127.0.0.1/amdjs-tests/tests/doh/runner.html?config=requirejs/config.js&impl=requirejs/require.js
 
 Or, use the **start.html** page for a page of quick links to start testing.
