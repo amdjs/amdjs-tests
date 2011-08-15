@@ -1,7 +1,7 @@
 # AMD Tests
 
 A set of Asynchronous Module Definition
-[AMD](http://wiki.commonjs.org/wiki/Modules/AsynchronousDefinition) compliance
+[AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) compliance
 tests.
 
 Right now the tests only run in the browser, but it will be possible to run
