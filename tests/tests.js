@@ -29,6 +29,7 @@
         anon: function () {
             reg('anon/simple');
             reg('anon/circular');
+            reg('anon/relativeModuleId');
         },
 
         funcString: function () {
