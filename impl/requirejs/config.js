@@ -12,6 +12,9 @@ var config = require,
         anon: true,
         funcString: true,
         require: true,
-        globalRequireConfig: true,
         plugins: true
     };
+
+//Remove the global require, to make sure a global require is not assumed
+//in the tests
+require = undefined;

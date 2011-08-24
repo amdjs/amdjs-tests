@@ -41,6 +41,14 @@ Very basic loading of named modules that have dependency arrays.
 * Circular dependency support via the "exports" and "require" dependency.
 * Test for the CommonJS "module" dependency.
 
+## require
+
+Basic require() support, in accordance with the [amdjs require API](https://github.com/amdjs/amdjs-api/wiki/require):
+
+* require(String)
+* require(Array, Function)
+* require.toUrl(String)
+
 ## anon
 
 Similar tests to **basic**, but using anonymous modules.
@@ -57,23 +65,6 @@ get out dependencies. Used to support simplified module wrapping:
         return {};
     });
 ```
-
-## require
-
-Basic require() support, in accordance with the [amdjs require API](https://github.com/amdjs/amdjs-api/wiki/require):
-
-* require(String)
-* require(Array, Function)
-* require.toUrl(String)
-
-## globalRequireConfig
-
-Tests a global require.config() function, as specified in the
-[amdjs require API](https://github.com/amdjs/amdjs-api/wiki/require#wiki-globalConfig). Just ensures
-the method exists, does not throw an error when given an object, and
-that a function is returned from the call.
-
-Support for this test is not required for any of the other tests to pass.
 
 ## plugins
 

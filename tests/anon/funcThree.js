@@ -1,4 +1,4 @@
-define(["funcFour"], function (four) {
+define(["require", "funcFour"], function (require, four) {
     var three = function (arg) {
         return arg + "-" + require("funcFour").suffix();
     };
