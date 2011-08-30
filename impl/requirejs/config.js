@@ -12,7 +12,8 @@ var config = require,
         anon: true,
         funcString: true,
         require: true,
-        plugins: true
+        plugins: true,
+        pluginDynamic: true
     };
 
 //Remove the global require, to make sure a global require is not assumed

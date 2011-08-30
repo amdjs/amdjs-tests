@@ -8,7 +8,8 @@
             'anon',
             'funcString',
             'require',
-            'plugins'
+            'plugins',
+            'pluginDynamic'
         ],
         i, levels, name;
 
@@ -43,6 +44,10 @@
             reg('plugins/double');
             reg('plugins/fromText');
             reg('plugins/normalize');
+        },
+
+        pluginDynamic: function () {
+            reg('plugins/dynamic');
         }
 
 

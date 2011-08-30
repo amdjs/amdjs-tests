@@ -74,6 +74,12 @@ Support for loader plugins.
 * Testing a plugin that implements normalize().
 * Testing a plugin that uses load.fromText().
 
+## pluginDynamic
+
+Support for loader plugins that use dynamic: true to indicate their resources
+should not be cached by the loader. Instead the loader should call the plugin's
+load() method for each instance of a dependency that can be loaded by the plugin.
+
 # Running the tests
 
 Run the tests through a web server. The URL should look like the following:
