@@ -72,7 +72,6 @@ var define;
     function isFunction(it) { return opts.call(it) === "[object Function]"; };
     function isArray(it) { return opts.call(it) === "[object Array]"; };
     function isString(it) { return (typeof it == "string" || it instanceof String); };
-    function contains(a, obj) { var i = a.length; while (i--) { if (a[i] === obj) { return true; }} return false; };
     
     function _getParentId() {
     	return moduleStack.length > 0 ? moduleStack[moduleStack.length-1].id : "";
