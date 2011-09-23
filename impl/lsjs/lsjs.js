@@ -35,23 +35,64 @@ var define;
 				return false;
 			}
 		},	
-		remove: function(key) {
-			localStorage.removeItem(key);
-		},
-		get: function(key) {
-			return JSON.parse(localStorage[key]);
-		},
-		set: function(key, entry) {
+		remove: function(key, handler, errorHandler) {
 			try {
-				localStorage[key] = JSON.stringify(entry);
-				return true;
-			} catch (e) {
-				console.log("Failed to set value in local storage ["+key+"] : "+e);
-				return false;
+				var json = localStorage[key];
+				if (json !== undefined && json !== null) {
+					var value = JSON.parse(json);
+					localStorage.removeItem(key);
+					if (handler) {
+						handler(value);
+					}
+				} else {
+					if (errorHandler) {
+						errorHandler("Failed to remove value in local storage ["+key+"]");
+					} else {
+						console.log("Failed to remove value in local storage ["+key+"]");
+					}
+				}
+			} catch(e) {
+				if (errorHandler) {
+					errorHandler(e);
+				} else {
+					console.log("Failed to remove value in local storage ["+key+"] : "+e);
+				}
 			}
 		},
-		has: function(key) {
-			return localStorage[key] !== undefined && localStorage[key] !== null;
+		get: function(key, handler, errorHandler) {
+			try {
+				var json = localStorage[key];
+				if (json !== undefined && json !== null) {
+					var value = JSON.parse(json);
+					handler(value);
+				} else {
+					if (errorHandler) {
+						errorHandler("Failed to get value in local storage ["+key+"]");
+					} else {
+						console.log("Failed to get value in local storage ["+key+"]");
+					}
+				}
+			} catch(e) {
+				if (errorHandler) {
+					errorHandler(e);
+				} else {
+					console.log("Failed to get value in local storage ["+key+"] : "+e);
+				}
+			}
+		},
+		set: function(key, entry, handler, errorHandler) {
+			try {
+				localStorage[key] = JSON.stringify(entry);
+				if (handler) {
+					handler(true);
+				}
+			} catch (e) {
+				if (errorHandler) {
+					errorHandler(e);
+				} else {
+					console.log("Failed to set value in local storage ["+key+"] : "+e);
+				}
+			}
 		}
 	};
 	
@@ -62,11 +103,12 @@ var define;
 	var reload = {};
 	var storage = lsImpl;
 	var loaded = {};
-	
-	if (storage.has("loaded!"+window.location.pathname)) {
-		loaded = storage.get("loaded!"+window.location.pathname);
-	}
+	var cache = {};
+	var cachets = {};
+	var usesCache = {};
 
+	var geval = window.execScript || eval;
+	
 	var opts = Object.prototype.toString;
 	
     function isFunction(it) { return opts.call(it) === "[object Function]"; };
@@ -129,7 +171,11 @@ var define;
     			break;
             }
 		}
-		path = _normalize(segments.join("/"));
+		path = segments.join("/");
+        if (path.charAt(0) !== '/') {
+        	path = cfg.baseUrl + path; 
+        }
+		path = _normalize(path);
 		return path;
 	};
 	
@@ -159,32 +205,35 @@ var define;
 		modules[expandedId].id = expandedId;
 		
 		var url = _idToUrl(expandedId);
-        if (url.charAt(0) !== '/') {
-        	url = cfg.baseUrl + url; 
-        }
     	url += ".js";
     	
-    	var key = cfg.keyPrefix + url;
-    	
+		var storedModule;
+    	function _load() {
+			if (scriptText) {
+				_inject(modules[expandedId], scriptText, cb);
+			} else if (storedModule === undefined || storedModule === null) {
+				_getModule(url, function(_url, scriptSrc, ts) {
+					var entry = {url: _url, timestamp: ts};
+					loaded[_url] = ts;
+					storage.set("loaded!"+window.location.pathname, loaded);
+					storage.set(_url, {src: scriptSrc, timestamp: ts});
+					_inject(modules[expandedId], scriptSrc, cb);
+				});
+			} else {
+				_inject(modules[expandedId], storedModule.src, cb);
+			}
+    	};
 		if (cfg.forceLoad || url in reload) {
-			storage.remove(key);
-		}
-		
-		if (storage.has(key)) {
-			var storedModule = storage.get(key);
-		}
-		
-		if (scriptText) {
-			_inject(modules[expandedId], scriptText, cb);
-		} else if (storedModule === undefined || storedModule === null) {
-			_getModule(url, function(scriptSrc, ts) {
-				var entry = {url: url, timestamp: ts};
-				loaded[url] = ts;
-				storage.set(key, {src: scriptSrc, timestamp: ts});
-				_inject(modules[expandedId], scriptSrc, cb);
+			storage.remove(url, function(){
+				_load();
 			});
 		} else {
-			_inject(modules[expandedId], storedModule.src, cb);
+			storage.get(url, function(value) {
+				storedModule = value;
+				_load();
+			}, function(error){
+				_load();
+			});
 		}
 	};
 	
@@ -198,7 +247,7 @@ var define;
 			script.appendChild(scriptContent);
 			document.getElementsByTagName("head")[0].appendChild(script);
 		} else {
-	        eval(scriptSrc+"//@ sourceURL="+module.id);
+			geval(scriptSrc+"//@ sourceURL="+module.id);
 		}
 		_loadModuleDependencies(module.id, function(exports){
 			moduleStack.pop();
@@ -212,7 +261,7 @@ var define;
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState == 4) {
 				if (xhr.status == 200) {
-					cb(xhr.responseText, xhr.getResponseHeader("Last-Modified"));
+					cb(url, xhr.responseText, xhr.getResponseHeader("Last-Modified"));
 				} else {
 					throw new Error("Unable to load ["+url+"]:"+xhr.status);
 				}
@@ -300,6 +349,19 @@ var define;
 			var load = function(pluginInstance){
 		    	modules[pluginName+"!"+pluginModuleName] = {};
 		    	modules[pluginName+"!"+pluginModuleName].exports = pluginInstance;
+		    	if (!isDynamic && pluginName in usesCache) {
+		    		var url = _idToUrl(pluginModuleName);
+		    		if (cache[url] === undefined || url in reload) {
+		    			_getLastModified(url, function(lastModified){
+		    				if (lastModified) {
+			    				cachets[url] = lastModified;
+				    			_storeCache();
+		    				}
+		    			});
+		    			cache[url] = pluginInstance;
+		    			_storeCache();
+		    		}
+		    	}
 				cb(pluginInstance);
 			};
 			load.fromText = function(name, text) {
@@ -326,7 +388,8 @@ var define;
 			}
 		};
 		req.toUrl = function(moduleResource) {
-			return _idToUrl(_expand(moduleResource));
+			var url = _idToUrl(_expand(moduleResource)); 
+			return url;
 		};
 		req.defined = function(moduleName) {
 			return _expand(moduleName) in modules;
@@ -345,7 +408,7 @@ var define;
 			return moduleName + ext;
 	    };
         // Dojo specific require properties and functions
-        req.cache = {};
+        req.cache = cache;
         req.toAbsMid = function(id) {
         	return _expand(id);
         };
@@ -355,11 +418,11 @@ var define;
 		return req;
 	};
 	
-	function _getTimestamps(url, cb) {
+	function _getTimestamps(timestampUrl, cb) {
 		var xhr = new XMLHttpRequest();
-		xhr.open("POST", url, true);
+		xhr.open("POST", timestampUrl, true);
 		xhr.setRequestHeader("Content-Type", "application/json");
-		
+
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState == 4) {
 				if (xhr.status == 200) {
@@ -369,15 +432,43 @@ var define;
 					}
 					cb();
 				} else {
-					throw new Error("Unable to get timestamps via the url ["+url+"]:"+xhr.status);
+					throw new Error("Unable to get timestamps via the url ["+timestampUrl+"]:"+xhr.status);
 				}
 			}
 		};
 		var current = [];
-		for (var url in loaded) {
+		var url;
+
+		for (url in loaded) {
 			current.push({url: url, timestamp: loaded[url]});
 		}
+		for (url in cachets) {
+			current.push({url: url, timestamp: cachets[url]});
+		}
 		xhr.send(JSON.stringify(current));
+	};
+
+	function _getLastModified(url, cb) {
+		var xhr = new XMLHttpRequest();
+		xhr.open("HEAD", url, true);
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState == 4) {
+				if (xhr.status == 200) {
+					cb(xhr.getResponseHeader("Last-Modified"));
+				} else {
+					cb();
+				}
+			}
+		};
+		xhr.send(null);
+	};
+
+	function _storeCache() {
+		var storedCache = {};
+		for (var url in cache) {
+			storedCache[url] = {value: cache[url], timestamp: cachets[url]};
+		}
+		storage.set("cache!"+window.location.pathname, storedCache);
 	};
 
 	define = function (id, dependencies, factory) {
@@ -454,10 +545,11 @@ var define;
 	
 	modules["require"] = {};
 	modules["require"].exports = _require;
-	var cfg = {baseUrl: "./", keyPrefix: window.location.pathname};
+	var cfg = {baseUrl: "./"};
 
 	lsjs = function(config, dependencies, callback) {
 		if (!isArray(config) && typeof config == "object") {
+			var i;
 			cfg = config;
 			if (cfg.paths) {
 				for (var p in cfg.paths) {
@@ -466,29 +558,48 @@ var define;
 				}
 			}
 			if (cfg.packages) {
-				for (var i = 0; i < cfg.packages.length; i++) {
+				for (i = 0; i < cfg.packages.length; i++) {
 					var pkg = cfg.packages[i];
 					pkgs[pkg.name] = pkg;
 				}
 			}
 			if (cfg.storageImpl) {
 				storage = cfg.storageImpl;
-				var requiredProps = ["get", "set", "has", "remove", "isSupported"];
-				for (var i = 0; i < requiredProps.length; i++) {
+				var requiredProps = ["get", "set", "remove", "isSupported"];
+				for (i = 0; i < requiredProps.length; i++) {
 					if (!storage[requiredProps[i]]) {
 						throw new Error("Storage implementation must implement ["+requiredProps[i]+"]");
 					}
 				}
 			}
+			if (cfg.usesCache) {
+				for (i = 0; i < cfg.usesCache.length; i++) {
+					usesCache[cfg.usesCache[i]] = true;
+				}
+			}
 			cfg.baseUrl = cfg.baseUrl || "./";
-			cfg.keyPrefix = cfg.keyPrefix || window.location.pathname;
 		} else {	
 			callback = dependencies;
 			dependencies = config;
 		}
+		if (cfg.baseUrl.charAt(0) !== '/') {
+			cfg.baseUrl = _normalize(window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/')) + '/'+ cfg.baseUrl);
+		}
 		if (!storage.isSupported()) {
 			throw new Error("Storage implementation is unsupported");
 		}
+
+		storage.get("loaded!"+window.location.pathname, function(value){
+			loaded = value;
+		}, function(error){});
+
+		storage.get("cache!"+window.location.pathname, function(storedcache) {
+			for (var url in storedcache) {
+				cache[url] = storedcache[url].value;
+				cachets[url] = storedcache[url].timestamp;
+			}
+		}, function(error){});
+
 		if (!isArray(dependencies)) {
 			callback = dependencies;
 			dependencies = [];
@@ -497,11 +608,9 @@ var define;
 			if (isFunction(callback)) {
 				_require(dependencies, function() {
 					callback.apply(null, arguments);
-					storage.set("loaded!"+window.location.pathname, loaded);
 				});
 			} else {
 				_require(dependencies);
-				storage.set("loaded!"+window.location.pathname, loaded);
 			}
 		};
 		if (cfg.timestampUrl) {
