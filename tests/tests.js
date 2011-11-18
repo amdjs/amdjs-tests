@@ -48,6 +48,7 @@
 
         pluginDynamic: function () {
             reg('plugins/dynamic');
+            reg('plugins/dynamicToString');
         }
 
 

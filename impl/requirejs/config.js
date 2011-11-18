@@ -12,8 +12,9 @@ var config = require,
         anon: true,
         funcString: true,
         require: true,
-        plugins: true,
-        pluginDynamic: true
+        plugins: true
+        //Does NOT support pluginDynamic in 1.0
+        //pluginDynamic: true
     };
 
 //Remove the global require, to make sure a global require is not assumed

@@ -1,5 +1,5 @@
 
-/*jslint strict: false, plusplus: false */
+/*jslint strict: false */
 /*global define: false */
 
 (function () {
@@ -11,7 +11,8 @@
             dynamic: true,
 
             load: function (name, require, load, config) {
-                load((counter++) + ':' + name);
+                counter += 1;
+                load(counter + ':' + name);
             }
         };
     });
