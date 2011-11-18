@@ -56,10 +56,22 @@ Similar tests to **basic**, but using anonymous modules.
 ## funcString
 
 Tests parsing of definition functions via Function.prototype.toString() to
-get out dependencies. Used to support simplified module wrapping:
+get out dependencies. Used to support simplified CommonJS module wrapping:
 
 ```javascript
     define(function (require) {
+        var a = require('a');
+        //Return the module definition.
+        return {};
+    });
+```
+
+## namedWrapped
+
+Similar to the **funcString** tests, but using named modules.
+
+```javascript
+    define('some/module', function (require) {
         var a = require('a');
         //Return the module definition.
         return {};

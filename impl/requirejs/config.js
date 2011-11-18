@@ -11,6 +11,7 @@ var config = require,
         basic: true,
         anon: true,
         funcString: true,
+        namedWrapped: true,
         require: true,
         plugins: true
         //Does NOT support pluginDynamic in 1.0

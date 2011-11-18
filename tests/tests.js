@@ -7,6 +7,7 @@
             'basic',
             'anon',
             'funcString',
+            'namedWrapped',
             'require',
             'plugins',
             'pluginDynamic'
@@ -34,6 +35,10 @@
 
         funcString: function () {
             reg('funcString/funcString');
+        },
+
+        namedWrapped: function () {
+            reg('namedWrapped/basic');
         },
 
         require: function () {
