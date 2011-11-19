@@ -9,8 +9,9 @@ var config = lsjs,
 		basic: true,
 		anon: true,
 		funcString: true,
+        namedWrapped: true,
 		require: true,
-		plugins: true,
-		pluginDynamic: true
+		plugins: true
+		//pluginDynamic: true
     };
 require = undefined;
