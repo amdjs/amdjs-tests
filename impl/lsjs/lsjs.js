@@ -493,7 +493,8 @@ var define;
 	};
 	
     define.amd = {
-        plugins: true
+        plugins: true,
+        jQuery: true
     };
 
 	_require = function (dependencies, callback) {
@@ -634,5 +635,9 @@ var define;
 	
 	if (!require) {
 		require = _require;
+		require.toUrl = function(moduleResource) {
+			var url = _idToUrl(_expand(moduleResource));
+			return url;
+		};
 	}
 }());
