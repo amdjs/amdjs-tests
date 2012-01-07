@@ -7,15 +7,18 @@
 /*
 
  Inject
- Copyright (c) 2011 Jakob Heuser <jakob@felocity.com>. All Rights Reserved.
+ Copyright (c) 2011 Jakob Heuser
  Apache Software License 2.0 (see below)
 
  lscache library (c) 2011 Pamela Fox
  Apache Software License 2.0 (see below)
 
  Porthole
- Copyright (c) 2011 Ternary Labs. All Rights Reserved.
+ Copyright (c) 2011 Ternary Labs
  MIT License (see below)
+
+ JSON
+ Public Domain 2011-10-19
 
  APACHE SOFTWARE LICENSE 2.0
  ===
@@ -393,9 +396,10 @@ var lscache = function() {
     localStorage.removeItem(touchedKey(key))
   }}
 }();
-var analyzeFile, anonDefineStack, applyRules, clearFileRegistry, commentRegex, commonJSFooter, commonJSHeader, context, createIframe, createModule, db, define, defineStaticRequireRegex, dispatchTreeDownload, downloadTree, executeFile, extractRequires, fileStorageToken, fileStore, fileSuffix, functionNewlineRegex, functionRegex, functionSpaceRegex, getFormattedPointcuts, getFunctionArgs, getXHR, hostPrefixRegex, hostSuffixRegex, iframeName, initializeExports, loadModules, namespace, pauseRequired, 
-processCallbacks, require, requireEnsureRegex, requireRegex, reset, responseSlicer, schemaVersion, sendToIframe, sendToXhr, treeNode, undef, userConfig, userModules, xDomainRpc, _db;
+var analyzeFile, anonDefineStack, applyRules, clearFileRegistry, commentRegex, commonJSFooter, commonJSHeader, context, createIframe, createModule, db, define, defineStaticRequireRegex, dispatchTreeDownload, downloadTree, executeFile, extractRequires, fileStorageToken, fileStore, fileSuffix, functionNewlineRegex, functionRegex, functionSpaceRegex, getFormattedPointcuts, getFunctionArgs, getXHR, hostPrefixRegex, hostSuffixRegex, iframeName, initializeExports, isIE, loadModules, namespace, pauseRequired, 
+processCallbacks, require, requireRegex, reset, responseSlicer, schemaVersion, sendToIframe, sendToXhr, treeNode, undef, userConfig, userModules, xDomainRpc, _db;
 var __hasProp = Object.prototype.hasOwnProperty;
+isIE = eval("/*@cc_on!@*/false");
 userConfig = {};
 undef = undef;
 schemaVersion = 1;
@@ -415,10 +419,6 @@ responseSlicer = /^(.+?)[\s]+([\w\W]+?)[\s]+([\w\W]+)$/m;
 functionRegex = /^[\s\(]*function[^(]*\(([^)]*)\)/;
 functionNewlineRegex = /\/\/.*?[\r\n]|\/\*(?:.|[\r\n])*?\*\//g;
 functionSpaceRegex = /\s+/g;
-requireRegex = null;
-defineStaticRequireRegex = null;
-requireEnsureRegex = null;
-commentRegex = null;
 requireRegex = /(?:^|[^\w\$_.\(])require\s*\(\s*("[^"\\]*(?:\\.[^"\\]*)*"|'[^'\\]*(?:\\.[^'\\]*)*')\s*\)/g;
 defineStaticRequireRegex = /^[\r\n\s]*define\(\s*("\S+",|'\S+',|\s*)\s*\[([^\]]*)\],\s*(function\s*\(|{).+/;
 commentRegex = /(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/mg;
@@ -1104,7 +1104,7 @@ applyRules = function(moduleId, save) {
 };
 anonDefineStack = [];
 executeFile = function(moduleId) {
-  var cuts, footer, header, module, path, requiredModuleId, runCmd, text, _i, _len, _ref;
+  var cuts, filePath, footer, header, message, module, newErr, path, requiredModuleId, runCmd, runHeader, sourceString, text, _i, _len, _ref;
   if(db.module.getExecuted(moduleId)) {
     return
   }
@@ -1120,11 +1120,19 @@ executeFile = function(moduleId) {
   text = db.module.getFile(moduleId);
   header = commonJSHeader.replace(/__MODULE_ID__/g, moduleId).replace(/__MODULE_URI__/g, path).replace(/__INJECT_NS__/g, namespace).replace(/__POINTCUT_BEFORE__/g, cuts.before);
   footer = commonJSFooter.replace(/__INJECT_NS__/g, namespace).replace(/__POINTCUT_AFTER__/g, cuts.after);
-  runCmd = "" + header + "\n" + text + "\n" + footer + "\n//@ sourceURL=" + path;
+  sourceString = isIE ? "" : "//@ sourceURL=" + path;
+  runHeader = header + "\n";
+  runCmd = [runHeader, text, ";", footer, sourceString].join("\n");
   try {
     module = context.eval(runCmd)
   }catch(err) {
-    throw err;
+    filePath = db.module.getPath(moduleId);
+    message = "(inject module eval) " + err.message + "\n    in " + path;
+    newErr = new Error(message);
+    newErr.name = err.name;
+    newErr.type = err.type;
+    newErr.origin = err;
+    throw newErr;
   }
   return db.module.setExports(module.id, module.exports)
 };
@@ -1294,6 +1302,15 @@ require.ensure = function(moduleList, callback) {
 require.setModuleRoot = function(root) {
   if(typeof root === "string" && root.lastIndexOf("/") !== root.length) {
     root = "" + root + "/"
+  }
+  if(typeof root === "string") {
+    if(root.indexOf("/") === 0) {
+      root = "" + location.protocol + "//" + location.host + root
+    }else {
+      if(root.indexOf(".") === 0) {
+        root = "" + location.protocol + "//" + location.host + "/" + root
+      }
+    }
   }
   return userConfig.moduleRoot = root
 };
