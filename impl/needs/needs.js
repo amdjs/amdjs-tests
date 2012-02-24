@@ -5,7 +5,7 @@
  * (c) 2012, Taka Kojima (taka@gigafied.com)
  * Licensed under the MIT License
  *
- * Date: Thu Feb 23 23:55:32 2012 -0800
+ * Date: Fri Feb 24 00:06:13 2012 -0800
  */
  (function () {
 
@@ -143,10 +143,10 @@
 	}
 
 	/*
-		Used by _get() and define().
-		Gets the module by `id`, otherwise if `def` is specified, define a new module.
+	* Used by _get() and define().
+	* Gets the module by `id`, otherwise if `def` is specified, define a new module.
 	*/
-	function _module (id, def, module, ns, i, l, parts, pi) {
+	function _module (id, def, noExports, ns, i, l, parts, pi) {
 		// Always return the require func back for "require" and the string back for "module" and "exports"
 		if (id === "require"){
 			return require;
@@ -164,12 +164,12 @@
 				if (!def) {
 					return false;
 				}
-				ns[pi] = {};
+				ns[pi] = def || {};
 			}
-			ns = def ? ns[pi] = def : ns[pi];
+			ns = ns[pi];
 		}
 
-		return module ? ns : ns.exports || ns;
+		return noExports ? ns : (ns.exports || ns);
 	}
 
 	// Gets the object by it's fully qualified identifier.
@@ -203,11 +203,11 @@
 	}
 
 	/*
-	Given a moduleID, will return all recursive dependencies in the format of :
-		[
-			0 : [normal dependencies]
-			1 : [dependencies that have circular references back to this module]
-		]
+	* Given a moduleID, will return all recursive dependencies in the format of :
+	*	[
+	*		0 : [normal dependencies]
+	*		1 : [dependencies that have circular references back to this module]
+	*	]
 	*/
 	function _getDependencies (id, deps, circularDeps, i, j, d, subDeps, sd) {
 
@@ -251,14 +251,14 @@
 	// Define a module
 	var define = function (id, dependencies, factory, alreadyQed, depsLoaded, module, facArgs) {
 
-        if (typeof id !== 'string') {
-            factory = dependencies;
-            dependencies = id;
-            id = null;
+		if (typeof id !== 'string') {
+			factory = dependencies;
+			dependencies = id;
+			id = null;
 
 			_defineQ.push([dependencies, factory]);
 			return;
-        }
+		}
 
 		if (!_isArray(dependencies)) {
 			factory = dependencies;
@@ -323,6 +323,8 @@
 			module.exports = factory;
 		}
 
+		console.log("defining " + id + "...");
+
 		_module(id, module);
 
 		_currentModuleID = null;
@@ -333,9 +335,9 @@
 	define.amd = {};
 
 	/**
-		Asynchronously loads in js files for the modules specified.
-		If the modules have already been loaded, or are already defined,
-		the callback function is invoked immediately.
+	* Asynchronously loads in js files for the modules specified.
+	* If the modules have already been loaded, or are already defined,
+	* the callback function is invoked immediately.
 	*/
 	var require = function (ids, callback, dirname) {
 
@@ -394,6 +396,9 @@
 	if(_root.require) {
 		require.config(_root.require);
 	}
+
+	require.modules = _modules;
+	require.lq = _loadQ;
 
 	// Define global define/require methods, unless they are already defined.
 	_root.define = _root.define || define;
