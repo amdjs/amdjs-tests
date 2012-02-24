@@ -12,8 +12,8 @@ var go = require,
 		basic: true,
 		anon: true,
 		require: true,
-		funcString: false,
-		namedWrapped: false,
+		funcString: true,
+		namedWrapped: true,
 		plugins: false,
 		pluginDynamic: false
 	};
