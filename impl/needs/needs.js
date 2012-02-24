@@ -5,7 +5,7 @@
  * (c) 2012, Taka Kojima (taka@gigafied.com)
  * Licensed under the MIT License
  *
- * Date: Fri Feb 24 00:06:13 2012 -0800
+ * Date: Fri Feb 24 02:24:17 2012 -0800
  */
  (function () {
 
@@ -322,8 +322,6 @@
 		else{
 			module.exports = factory;
 		}
-
-		console.log("defining " + id + "...");
 
 		_module(id, module);
 
