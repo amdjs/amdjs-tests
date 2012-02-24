@@ -5,7 +5,7 @@
  * (c) 2012, Taka Kojima (taka@gigafied.com)
  * Licensed under the MIT License
  *
- * Date: Thu Feb 23 15:41:22 2012 -0800
+ * Date: Thu Feb 23 15:45:00 2012 -0800
  */
  (function () {
 
@@ -34,10 +34,6 @@
 
 	function _isArray (a) {
 		return a instanceof Array;
-	}
-
-	function _strToArray (s) {
-		return (!_isArray(s)) ? [s] : s;
 	}
 
 	function _normalize (path) {
@@ -118,8 +114,11 @@
 				script.onload = script.onreadystatechange = script.onerror = null;
 				if (_defineQ.length > 0) {
 					q = _defineQ.splice(0,1)[0];
-					q.splice(0,0, m);
-					define.apply(_root, q);
+					if (q) {
+						q.splice(0,0, m); // set id to the module id before calling define()
+						q.splice(q.length,0, true); // set alreadyQed to true, before calling define()
+						define.apply(_root, q);
+					}
 				}
 			}
 		};
@@ -152,10 +151,12 @@
 		Used by _get() and define().
 		Gets the module by `id`, otherwise if `def` is specified, define a new module.
 	*/
-	function _module (id, def, module, ns, i, l, parts, pi) {
-
-		// Always return the string back for require, module and exports
-		if (id === "require" || id === "module" || id === "exports") {
+	function _module (id, def, module, ns, i, l, parts, pi, r) {
+		// Always return the require func back for "require" and the string back for "module" and "exports"
+		if (id === "require"){
+			return require;
+		}
+		if (id === "module" || id === "exports") {
 			return id;
 		}
 
@@ -247,60 +248,62 @@
 		for(var i = 0; i < circulars.length; i ++) {
 			var cid = circulars[i];
 			_module(cid, {
-				id: cid,
-				url: _getURL(cid),
+				id: 0,
+				url: 0,
 				exports : {}
 			});
 		}
 	}
 	
 	// Define a module
-	var define = function () {
+	var define = function (id, dependencies, factory, alreadyQed, depsLoaded) {
 
-		var i, j, id, dependencies, exports, modulePath, module, o, eArgs;
+		var module,
+			facArgs;
 
-		var args = Array.prototype.slice.call(arguments, 0);
+        if (typeof id !== 'string') {
+            factory = dependencies;
+            dependencies = id;
+            id = null;
 
-		// If only one argument is provided, it's the definition
-		if (args.length === 1) {
-			exports = args[0];
-		}
-		// Otherwise, if two arguments were passed in, id and exports were passed in with no dependencies
-		else if (args.length === 2 || args[2] === null) {
-			exports = args[1];
-
-			// If args[0] is an array, it's a list of dependencies
-			if (_isArray(args[0])) {
-				dependencies = args[0];
-			}
-			// Otherwise, args[0] is the identifier and args[1] is the exports object
-			else{
-				id = args[0];
-				exports = args[1];
-			}
-		}
-		else if (args.length === 3) {
-			id = args[0];
-			dependencies = args[1];
-			exports = args[2];
-		}
-		else{
-			throw new Error("Invalid call to define()");
-		}
-		if (!id) {
-			_defineQ.push(args);
+			_defineQ.push([dependencies, factory]);
 			return;
+        }
+
+		if (!_isArray(dependencies)) {
+			factory = dependencies;
+			dependencies = [];
+		}
+
+		if (!alreadyQed) {
+			_defineQ.push(null); // Add an empty queue here to be cleaned up by onLoad
 		}
 
 		_currentModuleID = id;
+		
+		if (!dependencies.length && factory.length && typeof factory === "function") {
 
-		dependencies = dependencies || [];
+			// Check for CommonJS-style requires, and add them to the deps array
+			factory.toString()
+				.replace(/(\/\*([\s\S]*?)\*\/|([^:]|^)\/\/(.*)$)/mg, "") // Remove any comments first
+				.replace(/(?:require)\(\s*["']([^'"\s]+)["']\s*\)/g, // Now let's check for any sync style require("module") calls
 
-		if (dependencies.length > 0) {
+					function ($0, $1) {
+						if (dependencies.indexOf($1) < 0) {
+							dependencies.push($1);
+						}
+					}
+				);
+
+			dependencies = (factory.length > 1 ? ["require", "exports", "module"] : ["require"]).concat(dependencies);
+		}
+
+		if (dependencies.length && !depsLoaded) {
 
 			_setDependencies(id, dependencies);
+
 			require(dependencies, function () {
-				define(id, exports, null, arguments);
+				define(id, Array.prototype.slice.call(arguments, 0), factory, true, true);
 			}, _dirname(id));
 
 			_currentModuleID = null;
@@ -314,24 +317,20 @@
 		module.id = id;
 		module.url = _getURL(id);
 
-		if (typeof exports === "function") {
-
-			eArgs = args[3] ? Array.prototype.slice.call(args[3], 0) : exports.length > 0 ? [require, module, module.exports] : [];
-
-			// Swap "require", "module" and "exports" with actual objects
-			eArgs =_swapArgs(
-				eArgs,
+		if (typeof factory === "function") {
+			// Swap "require", "module" and "factory" with actual objects
+			facArgs =_swapArgs(
+				dependencies.length ? dependencies : (factory.length > 1 ? [require, "exports", "module"] : [require]),
 				{
-					"require" : require,
 					"module" : module,
 					"exports" : module.exports
 				}
 			);
 
-			module.exports = exports.apply(exports, eArgs) || module.exports;
+			module.exports = factory.apply(factory, facArgs) || module.exports;
 		}
 		else{
-			module.exports = exports;
+			module.exports = factory;
 		}
 
 		_module(id, module);
@@ -357,12 +356,7 @@
 			return _get(ids);
 		}
 
-		ids = _strToArray(ids);
-
-		function cb (a) {
-			a = Array.prototype.slice.call(arguments, 0) || [];
-			return callback.apply(null, _swapArgs(a, {"require" : require}));
-		}
+		ids = (!_isArray(ids)) ? [ids] : ids;
 
 		var i, id, module, file, q,
 			fileList = [],
@@ -387,12 +381,11 @@
 			_load({
 				f: fileList,
 				m: moduleList,
-				cb : cb
+				cb : callback
 			});
 			return;
 		}
-
-		cb.apply(_root, modules);
+		callback.apply(_root, modules);
 	};
 
 	require.configure = function (obj) {
