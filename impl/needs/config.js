@@ -1,13 +1,5 @@
-function config (o) {
-	if (o.baseUrl) {
-		go.configure({rootPath: o.baseUrl});
-	}
-	else{
-		go.configure(o);
-	}
-}
-
 var go = require,
+	config = require,
 	implemented = {
 		basic: true,
 		anon: true,

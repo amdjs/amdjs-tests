@@ -1,11 +1,11 @@
 /*
- * needs.js v0.9.2
+ * needs.js v0.9.4
  * http://minion.org
  *
  * (c) 2012, Taka Kojima (taka@gigafied.com)
  * Licensed under the MIT License
  *
- * Date: Thu Feb 23 15:45:00 2012 -0800
+ * Date: Thu Feb 23 23:55:32 2012 -0800
  */
  (function () {
 
@@ -25,24 +25,23 @@
 		_dependencies = {}, // Used for checking circular dependencies.
 
 		// Configurable properties...
-		_rootPath = "",
+		_baseUrl = "",
 		_fileSuffix = "",
 		_paths = {},
 
 		// If this is node, set root to module.exports
-		_root = (typeof window !== "undefined") ? window : module.exports;
+		_root = (window) ? window : module.exports;
 
 	function _isArray (a) {
 		return a instanceof Array;
 	}
 
-	function _normalize (path) {
+	function _normalize (path, prevPath) {
 
 		// Replace any references to ./ with ""
 		path = path.replace(/(?:^|[^\.])(\.\/)/g, "/");
 
 		// Replace any references to some/path/../ with "some/"
-		var prevPath = "";
 		while (prevPath !== path) {
 			prevPath = path;
 			path = path.replace(/([\w,\-]*[\/]{1,})([\.]{2,}\/)/g, "/");
@@ -50,8 +49,7 @@
 
 		// Replace any references to "//" or "////" with a single "/"
 		path = path.replace(/(\/{2,})/g, "/");
-		path = path.charAt(0) === "/" ? path.substr(1) : path;
-		return path;
+		return path.charAt(0) === "/" ? path.substr(1) : path;
 	}
 
 	function _dirname (path) {
@@ -60,21 +58,21 @@
 	}
 
 	function _resolve (path, basePath) {
-		return _normalize((basePath || _rootPath) + "/" + path);
+		return _normalize((basePath || _baseUrl) + "/" + path);
 	}
 
-	function _checkLoadQ (i, j, l, q, ready) {
+	function _checkLoadQ (i, j, q, ready) {
 		
 		for (i = _loadQ.length-1; i >= 0; i --) {
 
-			ready = true;
+			ready = 1;
 			q = _loadQ[i];
 
 			if (q) {
 
 				for (j = q.m.length-1; j >= 0; j --) {
 					if (!require(q.m[j])) {
-						ready = false;
+						ready = 0;
 						break;
 					}
 				}
@@ -101,11 +99,7 @@
 
 		function isReady (r) {
 			r = script.readyState;
-			return (
-				!r ||
-				r == "complete" ||
-				r == "loaded"
-			);
+			return (!r || r == "complete" || r == "loaded");
 		}
 
 		// Bind to load events
@@ -123,6 +117,7 @@
 			}
 		};
 
+		// TODO: Need to add support for load timeouts...
 		script.onerror = function (e) {
 			script.onload = script.onreadystatechange = script.onerror = null;
 			throw new Error(f + " failed to load.");
@@ -151,7 +146,7 @@
 		Used by _get() and define().
 		Gets the module by `id`, otherwise if `def` is specified, define a new module.
 	*/
-	function _module (id, def, module, ns, i, l, parts, pi, r) {
+	function _module (id, def, module, ns, i, l, parts, pi) {
 		// Always return the require func back for "require" and the string back for "module" and "exports"
 		if (id === "require"){
 			return require;
@@ -191,12 +186,10 @@
 
 	// Gets the URL for a given moduleID.
 	function _getURL (id) {		
-		if(!id) {return "";}
-		id = id.indexOf("*") > -1 ? id.replace("/*", "") : id + ".js" + _fileSuffix;
 		for(var p in _paths) {
 			id = id.replace(new RegExp("(^" + p + ")", "g"), _paths[p]);
 		}
-		return id;
+		return id + ".js" + _fileSuffix;
 	}
 
 	function _swapArgs (a, s, j) {
@@ -216,17 +209,17 @@
 			1 : [dependencies that have circular references back to this module]
 		]
 	*/
-	function _getDependencies (id) {
+	function _getDependencies (id, deps, circularDeps, i, j, d, subDeps, sd) {
 
-		var deps = _dependencies[id] || [];
-		var circularDeps = [];
+		deps = _dependencies[id] || [];
+		circularDeps = [];
 
-		for (var i = 0; i < deps.length; i ++) {
-			var d = deps[i];
-			var subDeps = _dependencies[d];
+		for (i = 0; i < deps.length; i ++) {
+			d = deps[i];
+			subDeps = _dependencies[d];
 			if (subDeps) {
-				for (var j = 0; j < subDeps.length; j ++) {
-					var sd = subDeps[j];
+				for (j = 0; j < subDeps.length; j ++) {
+					sd = subDeps[j];
 					if (sd != id && deps.indexOf(sd) < 0) {
 						deps.push(sd);
 					}
@@ -239,14 +232,14 @@
 		return [deps, circularDeps];
 	}
 
-	function _setDependencies (id, dependencies) {
+	function _setDependencies (id, dependencies, circulars, i, cid) {
 		
 		_dependencies[id] = dependencies.slice(0);
-		var circulars = _getDependencies(id)[1];
+		circulars = _getDependencies(id)[1];
 
 		// Define circular modules as empty modules to be defined later
-		for(var i = 0; i < circulars.length; i ++) {
-			var cid = circulars[i];
+		for(i = 0; i < circulars.length; i ++) {
+			cid = circulars[i];
 			_module(cid, {
 				id: 0,
 				url: 0,
@@ -256,10 +249,7 @@
 	}
 	
 	// Define a module
-	var define = function (id, dependencies, factory, alreadyQed, depsLoaded) {
-
-		var module,
-			facArgs;
+	var define = function (id, dependencies, factory, alreadyQed, depsLoaded, module, facArgs) {
 
         if (typeof id !== 'string') {
             factory = dependencies;
@@ -351,7 +341,7 @@
 
 		if(!callback) {
 			if (typeof ids === "object" && !_isArray(ids)) {
-				return require.configure(ids);
+				return require.config(ids);
 			}
 			return _get(ids);
 		}
@@ -388,9 +378,9 @@
 		callback.apply(_root, modules);
 	};
 
-	require.configure = function (obj) {
+	require.config = function (obj) {
 		obj = obj || {};
-		_rootPath = obj.rootPath || _rootPath;
+		_baseUrl = obj.baseUrl || _baseUrl;
 		_fileSuffix = obj.fileSuffix ? "?" + obj.fileSuffix : _fileSuffix;
 		for (var p in obj.paths) {
 			_paths[p] = obj.paths[p];
