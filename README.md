@@ -105,3 +105,11 @@ To run the tests using the version of RequireJS in this repository:
     http://127.0.0.1/amdjs-tests/tests/doh/runner.html?config=requirejs/config.js&impl=requirejs/require.js
 
 Or, use the **start.html** page for a page of quick links to start testing.
+
+# License
+
+amdjs-tests is released under two licenses: new BSD, and MIT. See the LICENSE
+file for more info.
+
+The individual loader implementations are subject to their own specific
+licenses. This license only covers the tests.
