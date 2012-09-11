@@ -10,7 +10,8 @@
             'namedWrapped',
             'require',
             'plugins',
-            'pluginDynamic'
+            'pluginDynamic',
+            'mapConfig'
         ],
         i, levels, name;
 
@@ -54,8 +55,13 @@
         pluginDynamic: function () {
             reg('plugins/dynamic');
             reg('plugins/dynamicToString');
-        }
+        },
 
+		mapConfig: function () {
+            reg('mapConfig/mapConfig');
+            reg('mapConfig/mapConfigStar');
+            reg('mapConfig/mapConfigStarAdapter');
+		}
 
         //basic: true, //include require, exports, module tests.
         //anonymous: true, //include function callback and basic object callback,
