@@ -13,7 +13,8 @@ var config = require,
         funcString: true,
         namedWrapped: true,
         require: true,
-        plugins: true
+        plugins: true,
+        mapConfig: true
         //Does NOT support pluginDynamic in 1.0
         //pluginDynamic: true
     };
