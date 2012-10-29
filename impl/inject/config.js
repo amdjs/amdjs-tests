@@ -5,19 +5,19 @@ Either clear the browser cookies or programatically run localStorage.clear();
 */
 function setModuleRoot() {
   var url = location.href.split("?")[0],
-      base = url.substr(0, url.lastIndexOf("/"));
-  Inject.require.setModuleRoot(base);
+      base = url.substr(0, url.lastIndexOf("/")+1);
+  Inject.setModuleRoot(base);
 }
 
 Inject.reset();
 var config = function(pathObj) {
       for(var key in pathObj.paths) {
-        Inject.require.addRule(key, {path:pathObj.paths[key]});
+        Inject.addRule(key, {path:pathObj.paths[key]});
       }
     },
     go = function() {
       setModuleRoot();
-      Inject.require.apply(this, arguments);
+      Inject.require.apply(this, arguments)
     },
     implemented = {
         basic: true,
