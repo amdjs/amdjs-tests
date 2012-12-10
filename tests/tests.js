@@ -11,7 +11,8 @@
             'require',
             'plugins',
             'pluginDynamic',
-            'mapConfig'
+            'mapConfig',
+            'moduleConfig'
         ],
         i, levels, name;
 
@@ -61,7 +62,11 @@
             reg('mapConfig/mapConfig');
             reg('mapConfig/mapConfigStar');
             reg('mapConfig/mapConfigStarAdapter');
-		}
+		},
+
+        moduleConfig: function () {
+            reg('moduleConfig/moduleConfig');
+        }
 
         //basic: true, //include require, exports, module tests.
         //anonymous: true, //include function callback and basic object callback,
