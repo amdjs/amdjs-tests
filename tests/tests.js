@@ -12,7 +12,8 @@
             'plugins',
             'pluginDynamic',
             'mapConfig',
-            'moduleConfig'
+            'moduleConfig',
+            'shimConfig'
         ],
         i, levels, name;
 
@@ -66,6 +67,10 @@
 
         moduleConfig: function () {
             reg('moduleConfig/moduleConfig');
+        },
+
+        shimConfig: function () {
+            reg('shimConfig/basic');
         }
 
         //basic: true, //include require, exports, module tests.

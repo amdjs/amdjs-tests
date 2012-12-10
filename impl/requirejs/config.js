@@ -15,7 +15,8 @@ var config = require,
         require: true,
         plugins: true,
         mapConfig: true,
-        moduleConfig: true
+        moduleConfig: true,
+        shimConfig: true
         //Does NOT support pluginDynamic in 1.0
         //pluginDynamic: true
     };
