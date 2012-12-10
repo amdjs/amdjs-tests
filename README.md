@@ -92,6 +92,10 @@ Support for loader plugins that use dynamic: true to indicate their resources
 should not be cached by the loader. Instead the loader should call the plugin's
 load() method for each instance of a dependency that can be loaded by the plugin.
 
+## packagesConfig
+
+Support for the [common config API](https://github.com/amdjs/amdjs-api/wiki/Common-Config) section on [map config](https://github.com/amdjs/amdjs-api/wiki/Common-Config#wiki-packages).
+
 ## mapConfig
 
 Support for the [common config API](https://github.com/amdjs/amdjs-api/wiki/Common-Config) section on [map config](https://github.com/amdjs/amdjs-api/wiki/Common-Config#wiki-map).
@@ -99,6 +103,10 @@ Support for the [common config API](https://github.com/amdjs/amdjs-api/wiki/Comm
 ## moduleConfig
 
 Support for the [common config API](https://github.com/amdjs/amdjs-api/wiki/Common-Config) section on [module config](https://github.com/amdjs/amdjs-api/wiki/Common-Config#wiki-config).
+
+## shimConfig
+
+Support for the [common config API](https://github.com/amdjs/amdjs-api/wiki/Common-Config) section on [shim config](https://github.com/amdjs/amdjs-api/wiki/Common-Config#wiki-shim).
 
 # Running the tests
 

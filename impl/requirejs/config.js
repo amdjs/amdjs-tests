@@ -14,6 +14,7 @@ var config = require,
         namedWrapped: true,
         require: true,
         plugins: true,
+        packagesConfig: true,
         mapConfig: true,
         moduleConfig: true,
         shimConfig: true

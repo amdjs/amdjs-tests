@@ -11,6 +11,7 @@
             'require',
             'plugins',
             'pluginDynamic',
+            'packagesConfig',
             'mapConfig',
             'moduleConfig',
             'shimConfig'
@@ -57,6 +58,10 @@
         pluginDynamic: function () {
             reg('plugins/dynamic');
             reg('plugins/dynamicToString');
+        },
+
+        packagesConfig: function () {
+            reg('packagesConfig/packages');
         },
 
 		mapConfig: function () {
