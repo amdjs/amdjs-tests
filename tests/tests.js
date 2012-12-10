@@ -11,6 +11,7 @@
             'require',
             'plugins',
             'pluginDynamic',
+            'pathsConfig',
             'packagesConfig',
             'mapConfig',
             'moduleConfig',
@@ -58,6 +59,10 @@
         pluginDynamic: function () {
             reg('plugins/dynamic');
             reg('plugins/dynamicToString');
+        },
+
+        pathsConfig: function () {
+            reg('pathsConfig/paths');
         },
 
         packagesConfig: function () {
