@@ -1,5 +1,5 @@
 config({
-    baseUrl: requirejs.isBrowser ? "./" : "./packages/",
+    baseUrl: './',
     paths: {
         'alpha/replace' : 'replace'
     },
