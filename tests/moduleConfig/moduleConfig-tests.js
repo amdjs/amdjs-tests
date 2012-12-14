@@ -6,15 +6,16 @@ config({
     }
 });
 
-go({
-        baseUrl: './',
-        config: {
-            'b/c': {
-                id: 'beans'
-            }
+config({
+    baseUrl: './',
+    config: {
+        'b/c': {
+            id: 'beans'
         }
-    },
-    ['a', 'b/c', 'plain'],
+    }
+});
+
+go(['a', 'b/c', 'plain'],
     function(a, c, plain) {
         doh.register(
             'moduleConfig',
