@@ -1,14 +1,9 @@
 config({
+    baseUrl: './',
     config: {
         a: {
             id: 'magic'
-        }
-    }
-});
-
-config({
-    baseUrl: './',
-    config: {
+        },
         'b/c': {
             id: 'beans'
         }
