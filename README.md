@@ -4,8 +4,7 @@ A set of Asynchronous Module Definition
 [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) compliance
 tests.
 
-Right now the tests only run in the browser, but it will be possible to run
-them in Node and Rhino.
+The tests come with a built in harness for the browser, but can be ran in any JS environment. All that is required is an amdJS global object with a `print()` method.
 
 # Configuration
 
@@ -110,17 +109,12 @@ Support for the [common config API](https://github.com/amdjs/amdjs-api/wiki/Comm
 
 # Running the tests
 
-Run the tests through a web server. The URL should look like the following:
+```sh
+npm install
+node server/server.js
+```
 
-    http://127.0.0.1/amdjs-tests/tests/doh/runner.html?config=path/to/config.js&impl=path/to/loader.js
-
-Where both the config and impl paths are paths that are inside the **impl** directory in this project.
-
-To run the tests using the version of RequireJS in this repository:
-
-    http://127.0.0.1/amdjs-tests/tests/doh/runner.html?config=requirejs/config.js&impl=requirejs/require.js
-
-Or, use the **start.html** page for a page of quick links to start testing.
+And visit http://localhost:4000 to get started
 
 # License
 
