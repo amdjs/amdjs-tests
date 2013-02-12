@@ -2,19 +2,19 @@ var util = require('util');
 var path = require('path');
 var fs = require('fs');
 var express = require('express');
+var manifest = require('./manifest').manifest;
 var app = express();
 
 app.get('/', function(req, res) {
   // run all tests
   if (req.query)
-  fs.readFile(path.normalize(path.join(__dirname, './all.html')), function(err, data) {
+  fs.readFile(path.normalize(path.join(__dirname, './resources/all.html')), function(err, data) {
     var frameworkConfigScriptTag = (req.query.framework) ? '<script src="/config/'+req.query.framework+'.js"></script>' : '';
     var frameworkLibScriptTag = (req.query.framework) ? '<script src="/framework/'+req.query.framework+'.js"></script>' : '';
 
-    var fwkList = fs.readdirSync(path.normalize(path.join(__dirname, '../impl')));
     var frameworkOptions = [];
-    for (var i = 0, len = fwkList.length; i < len; i++) {
-      frameworkOptions.push('<option value="'+fwkList[i]+'">'+fwkList[i]+'</option>');
+    for (var id in manifest) {
+      frameworkOptions.push('<option value="'+id+'">'+manifest[id].name+'</option>');
     }
     
     var output = data.toString()
@@ -29,21 +29,21 @@ app.get('/', function(req, res) {
 
 app.get('/util/reporter.js', function(req, res) {
   // load the reporters
-  fs.readFile(path.normalize(path.join(__dirname, './reporter.js')), function(err, data) {
+  fs.readFile(path.normalize(path.join(__dirname, './resources/reporter.js')), function(err, data) {
     res.end(data.toString());
   });
 });
 
 app.get('/util/all.js', function(req, res) {
   // load the reporters
-  fs.readFile(path.normalize(path.join(__dirname, './all.js')), function(err, data) {
+  fs.readFile(path.normalize(path.join(__dirname, './resources/all.js')), function(err, data) {
     res.end(data.toString());
   });
 });
 
 app.get('/util/all.css', function(req, res) {
   // load the reporters
-  fs.readFile(path.normalize(path.join(__dirname, './all.css')), function(err, data) {
+  fs.readFile(path.normalize(path.join(__dirname, './resources/all.css')), function(err, data) {
     res.end(data.toString());
   });
 });
@@ -51,7 +51,7 @@ app.get('/util/all.css', function(req, res) {
 app.get('/framework/:framework', function(req, res) {
   // load a framework file
   var framework = req.params.framework.replace(/\.js$/, '');
-  fs.readFile(path.normalize(path.join(__dirname, '../impl/'+framework+'/'+framework+'.js')), function(err, data) {
+  fs.readFile(path.normalize(path.join(__dirname, '../impl/'+manifest[framework].impl)), function(err, data) {
     res.end(data.toString());
   });
 });
@@ -59,14 +59,14 @@ app.get('/framework/:framework', function(req, res) {
 app.get('/config/:framework', function(req, res) {
   // load a config file
   var framework = req.params.framework.replace(/\.js$/, '');
-  fs.readFile(path.normalize(path.join(__dirname, '../impl/'+framework+'/config.js')), function(err, data) {
+  fs.readFile(path.normalize(path.join(__dirname, '../impl/'+manifest[framework].config)), function(err, data) {
     res.end(data.toString());
   });
 });
 
 app.get('/:framework/:test/test.html', function(req, res) {
   // run one test
-  fs.readFile(path.normalize(path.join(__dirname, './template.html')), function(err, data) {
+  fs.readFile(path.normalize(path.join(__dirname, './resources/template.html')), function(err, data) {
     var framework = '/framework/'+req.params.framework+'.js';
     var fwkConfig = '/config/'+req.params.framework+'.js';
     var reporter = '/util/reporter.js';
