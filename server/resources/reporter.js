@@ -7,6 +7,7 @@
 
   amdJS.group = function (group) {
     lastGroup = group;
+    amdJS.print('START ('+lastGroup+')');
   };
 
   amdJS.done = function () {
@@ -18,6 +19,7 @@
     document.body.style.backgroundColor = (failed) ? 'red' : 'green';
     amdJS.print('INFO ' + groupString + passes + ' passes' ,'info');
     amdJS.print('INFO ' + groupString + fails + ' fails' ,'info');
+    amdJS.print('DONE ' + groupString);
   };
 
   amdJS.assert = function (guard, message) {

@@ -1,3 +1,4 @@
+amdJS.group('plugin_double');
 
 var count = 0;
 var timeout = 10000;
