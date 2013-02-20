@@ -85,7 +85,7 @@ Using the above, this would be the QUnit equivalent. We use the QUnit **stop** a
 
 We recommend mounting this repository as a [git submodule](http://git-scm.com/book/en/Git-Tools-Submodules), at which point you can have your testing framework invoke each individual js test.
 
-If you wish to hook this up directly to Travis-CI, an element is added to the page (*#result*) with a pass/fail string as its contents. A capture of `console.log()` will also output details in the CI runs.
+If you wish to hook this up directly to Travis-CI, an element is added to the page (*#travis-results*) with a pass/fail string as its contents. A capture of `console.log()` will also output details in the CI runs.
 
 # Test Types
 

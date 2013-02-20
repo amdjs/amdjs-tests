@@ -23,6 +23,12 @@ var expectedDone = 0;
 var failed = false;
 var travisResult = document.createElement('div');
 
+var globalTimeout = window.setTimeout(function() {
+  failed = true;
+  travisResult.innerHTML = 'fail';
+  document.body.appendChild(travisResult);
+});
+
 travisResult.id = 'travis-results';
 
 // tag valid tests as testable
@@ -91,6 +97,7 @@ window.amdJSSignal = {
   done: function() {
     expectedDone--;
     if (expectedDone <= 0 && !failed) {
+      window.clearTimeout(globalTimeout);
       travisResult.innerHTML = 'pass';
       document.body.appendChild(travisResult);
     }
