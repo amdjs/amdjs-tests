@@ -53,9 +53,6 @@
         else if (type === 'done') {
           window.top.amdJSSignal.done();
         }
-        else if (type === 'pass') {
-          window.top.amdJSSignal.pass();
-        }
       }
 
       if (type === 'fail') {

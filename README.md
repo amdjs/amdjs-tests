@@ -37,6 +37,8 @@ signature.
 * **implemented**: an object whose properties are the types of tests that the
 loader expects to pass. A list of valid test categories are at the end of this readme.
 
+Please then add your framework to `server/manifest` and add a line to `.travis.yml` to begin auto-testing your code.
+
 # Adding AMD-JS Tests To Your Own Framework
 
 It's possible to run the AMD-JS tests as part of your existing CI system. You need to provide *bridges* between the AMD-JS suite and your unit testing framework of choice. You can do this by either implementing a global `amdJSPrint` object or defining/implementing a global `system` object on which a `print()` method resides.
@@ -51,7 +53,7 @@ window.amdJSPrint = function (message, type) {
 
 * **amdJSPrint(message, type)**: Outputs the results of a reporter assertion. The *type* is one of `pass`, `fail`, `info`, or `done`.
 
-Using the above, this would be the QUnit equivalent. We use the QUnit **stop** and **start** methods to support any asynchronous operations that may be occuring in the test.
+Using the above, this would be the QUnit equivalent. We use the QUnit **stop** and **start** methods to support any asynchronous operations that may be occuring in the test. In the example below, we also proxy our `go` method, allowing us to capture when a require() call begins, and when all callbacks have completed.
 
 ```js
 // load me after your AMD implementation that provides
@@ -90,7 +92,9 @@ If you wish to hook this up directly to Travis-CI, an element is added to the pa
 Each test type builds on the other: supporting later test types implies support
 for earlier test types.
 
-## basic
+## Basic AMD Functionality (basic)
+
+**in the basic_* directories (except basic_require)**
 
 Very basic loading of named modules that have dependency arrays.
 
@@ -100,7 +104,9 @@ Very basic loading of named modules that have dependency arrays.
 * Circular dependency support via the "exports" and "require" dependency.
 * Test for the CommonJS "module" dependency.
 
-## require
+## The Basic require() Method (require)
+
+**in the basic_require directory**
 
 Basic require() support, in accordance with the [amdjs require API](https://github.com/amdjs/amdjs-api/wiki/require):
 
@@ -108,11 +114,15 @@ Basic require() support, in accordance with the [amdjs require API](https://gith
 * require(Array, Function)
 * require.toUrl(String)
 
-## anon
+## Anonymous Module Support (anon)
+
+**in the anon_* directories**
 
 Similar tests to **basic**, but using anonymous modules.
 
-## funcString
+## CommonJS Compatibility (funcString)
+
+**in the cjs_define directory**
 
 Tests parsing of definition functions via Function.prototype.toString() to
 get out dependencies. Used to support simplified CommonJS module wrapping:
@@ -125,7 +135,9 @@ get out dependencies. Used to support simplified CommonJS module wrapping:
   });
 ```
 
-## namedWrapped
+## CommonJS Compatibility with Named Modules (namedWrap)
+
+**in the cjs_named directory**
 
 Similar to the **funcString** tests, but using named modules.
 
@@ -137,7 +149,9 @@ Similar to the **funcString** tests, but using named modules.
   });
 ```
 
-## plugins
+## AMD Loader Plugins (plugins)
+
+**in the plugin_double, plugin_fromtext, plugin_normalize* directories**
 
 Support for loader plugins.
 
@@ -145,25 +159,41 @@ Support for loader plugins.
 * Testing a plugin that implements normalize().
 * Testing a plugin that uses load.fromText().
 
-## pluginDynamic
+## Dynamic Plugins (pluginsDynamic)
+
+**in the plugin_dynamic and plugin_dynamic_string* directories**
 
 Support for loader plugins that use dynamic: true to indicate their resources
 should not be cached by the loader. Instead the loader should call the plugin's
 load() method for each instance of a dependency that can be loaded by the plugin.
 
-## packagesConfig
+## Common Config: Packages
+
+**in the config_packages directory**
 
 Support for the [common config API](https://github.com/amdjs/amdjs-api/wiki/Common-Config) section on [map config](https://github.com/amdjs/amdjs-api/wiki/Common-Config#wiki-packages).
 
-## mapConfig
+## Common Config: Map
+
+**in the config_map and config_map_* directories**
 
 Support for the [common config API](https://github.com/amdjs/amdjs-api/wiki/Common-Config) section on [map config](https://github.com/amdjs/amdjs-api/wiki/Common-Config#wiki-map).
 
-## moduleConfig
+## Common Config: Module
+
+**in the config_module directory**
 
 Support for the [common config API](https://github.com/amdjs/amdjs-api/wiki/Common-Config) section on [module config](https://github.com/amdjs/amdjs-api/wiki/Common-Config#wiki-config).
 
-## shimConfig
+## Common Config: Path
+
+**in the config_paths directory**
+
+Support for the [common config API](https://github.com/amdjs/amdjs-api/wiki/Common-Config) section on [paths config](https://github.com/amdjs/amdjs-api/wiki/Common-Config#wiki-path).
+
+## Common Config: Shim
+
+**in the config_shim directory**
 
 Support for the [common config API](https://github.com/amdjs/amdjs-api/wiki/Common-Config) section on [shim config](https://github.com/amdjs/amdjs-api/wiki/Common-Config#wiki-shim).
 
