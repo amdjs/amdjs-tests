@@ -39,43 +39,46 @@ loader expects to pass. A list of valid test categories are at the end of this r
 
 # Adding AMD-JS Tests To Your Own Framework
 
-It's possible to run the AMD-JS tests as part of your existing CI system. You need to provide *bridges* between the AMD-JS suite (methods under the **amdjs** namespace) and your unit testing framework of choice.
+It's possible to run the AMD-JS tests as part of your existing CI system. You need to provide *bridges* between the AMD-JS suite and your unit testing framework of choice. You can do this by either implementing a global `amdJSPrint` object or defining/implementing a global `system` object on which a `print()` method resides.
 
 Here is a rudimentary system that just outputs to the console:
 
 ```js
-amdJS = {
-  group: function(name) {
-    console.log('testing group ' + name);
-  },
-  done: function() {
-    console.log('test completed');
-  },
-  assert = function (pass, message) {
-    (pass) ? console.log('PASS ' + message) : console.log('FAIL' + message);
-  }
-}
+window.amdJSPrint = function (message, type) {
+  console.log(message, type);
+};
 ```
 
-* **amdJS.group(name)**: signals the start of a test group called *name*. Called from the individual test page.
-* **amdJS.done()**: signals the end of the test group
-* **amdJS.assert(pass, message)**: captures the result of the true/false and a message. If pass is *false*, the test has failed. *message* provides a message to explain the error.
+* **amdJSPrint(message, type)**: Outputs the results of a reporter assertion. The *type* is one of `pass`, `fail`, `info`, or `done`.
 
 Using the above, this would be the QUnit equivalent. We use the QUnit **stop** and **start** methods to support any asynchronous operations that may be occuring in the test.
 
 ```js
-amdJS = {
-  group: function(name) {
-    module(name);
+// load me after your AMD implementation that provides
+// "go", "config", and "implemented"
+(function() {
+  var oldGo = window.go;
+  window.go = function () {
+    var newArgs = [].splice.call(arguments, 0);
+    var fn = newArgs[newArgs.length - 1];
+
+    // pause qunit test execution until the dependencies
+    // are resolved
     stop();
-  },
-  done: function() {
-    start();
-  },
-  assert = function (pass, message) {
-    ok(pass, message);
-  }
-}
+    newArgs[newArgs.length - 1] = function () {
+      fn.apply(undefined, arguments);
+      start();
+    };
+
+    oldGo.apply(window, newArgs);
+  };
+  window.amdJSPrint = function (message, type) {
+    if (type === 'info' || type === 'done') return;
+    test(message, function() {
+      ok(type === 'pass', message);
+    });
+  };
+})();
 ```
 
 We recommend mounting this repository as a [git submodule](http://git-scm.com/book/en/Git-Tools-Submodules), at which point you can have your testing framework invoke each individual js test.

@@ -1,8 +1,9 @@
-go(     ['refine!a'],
-function (a) {
+go(["_reporter"], function(amdJS) {
 
-  amdJS.group('plugin_fromtext');
-  amdJS.assert('a' === a.name, 'a.name');
-  amdJS.done();
+  go(     ['refine!a'],
+  function (a) {
+    amdJS.assert('a' === a.name, 'plugin_fromtext: a.name');
+    amdJS.print('DONE', 'done');
+  });
 
 });

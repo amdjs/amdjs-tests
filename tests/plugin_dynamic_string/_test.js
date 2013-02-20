@@ -1,14 +1,13 @@
-/*jslint strict: false */
-/*global go, doh */
+go(["_reporter"], function(amdJS) {
 
-go(     ['mattress'],
-function (mattress) {
-  amdJS.group('plugin_dynamic_string');
-  //Make sure the resource names do not match for the
-  //three kinds of pillow-related resources.
-  amdJS.assert('mattress' === mattress.name, 'mattress.name is unique');
-  amdJS.assert('1:medium' === mattress.id1, 'mattress.id1 is unique');
-  amdJS.assert('2:medium' === mattress.id2, 'mattress.id2 is unique');
-  amdJS.done();
+  go(     ['mattress'],
+  function (mattress) {
+    //Make sure the resource names do not match for the
+    //three kinds of pillow-related resources.
+    amdJS.assert('mattress' === mattress.name, 'plugin_dynamic_string: mattress.name is unique');
+    amdJS.assert('1:medium' === mattress.id1, 'plugin_dynamic_string: mattress.id1 is unique');
+    amdJS.assert('2:medium' === mattress.id2, 'plugin_dynamic_string: mattress.id2 is unique');
+    amdJS.print('DONE', 'done');
+  });
 
 });

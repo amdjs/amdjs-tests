@@ -1,55 +1,67 @@
+/*
+ * This file bridges the standard AMD-JS test suite with the simple
+ * browser runner. We proxy the go() method, and then we implement
+ * the window.amdJSPrint method as per the specification.
+ *
+ * The proxy of go() allows us to manage a timeout for the test
+ * in case there is a deep problem with the loader itself 
+ * (read: even require() is broken)
+ *
+ * The amdJSPrint method pushes data to the top-level window.console
+ * as well as registering its suite result with the parent
+ */
 (function(scope) {
-  var amdJS = scope.amdJS || {};
-  var lastGroup = null;
-  var failed = false;
-  var passes = 0;
-  var fails = 0;
+  // load me after your AMD implementation that provides
+  // "go", "config", and "implemented"
+  (function() {
+    var oldGo = window.go;
+    var stopStack = [];
+    var pass = true;
 
-  amdJS.group = function (group) {
-    lastGroup = group;
-    amdJS.print('START ('+lastGroup+')');
-  };
+    // resolve the test to a background color
+    var resolve = function() {
+      document.body.style.backgroundColor = (pass) ? 'green' : 'red';
+    };
 
-  amdJS.done = function () {
-    var groupString = '';
-    if (lastGroup) {
-      groupString = '('+lastGroup+') ';
-    }
+    // override go() with a start/stop timer
+    window.go = function () {
+      var newArgs = [].splice.call(arguments, 0);
+      var fn = newArgs[newArgs.length - 1];
 
-    document.body.style.backgroundColor = (failed) ? 'red' : 'green';
-    amdJS.print('INFO ' + groupString + passes + ' passes' ,'info');
-    amdJS.print('INFO ' + groupString + fails + ' fails' ,'info');
-    amdJS.print('DONE ' + groupString);
-  };
+      stopStack.push(window.setTimeout(function() {
+        window.amdJSPrint('Test timed out: ' + newArgs.join(';'), 'fail');
+      }, 3000));
+      newArgs[newArgs.length - 1] = function () {
+        fn.apply(undefined, arguments);
+        window.clearTimeout(stopStack.pop());
+        resolve();
+      };
 
-  amdJS.assert = function (guard, message) {
-    var groupString = '';
-    if (lastGroup) {
-      groupString = '('+lastGroup+') ';
-    }
+      oldGo.apply(window, newArgs);
+    };
 
-    if (guard) {
-      passes++;
-      amdJS.print('PASS ' + groupString + message, 'pass');
-    }
-    else {
-      failed = true;
-      fails++;
-      amdJS.print('FAIL ' + groupString + message, 'fail');
-    }
-  };
+    // print causes a console log event
+    // on first fail, we flag as red
+    window.amdJSPrint = function (message, type) {
+      var fullMessage = type + '    ' + message;
+      window.top.console.log(fullMessage);
 
-  amdJS.print = function (message, status) {
-    if (window.top !== window) {
-      if (window.top.amdJS && window.top.amdJS.print) {
-        window.top.amdJS.print(message, status);
+      if (window.top.amdJSSignal) {
+        if (type === 'fail') {
+          window.top.amdJSSignal.fail(message);
+        }
+        else if (type === 'done') {
+          window.top.amdJSSignal.done();
+        }
+        else if (type === 'pass') {
+          window.top.amdJSSignal.pass();
+        }
       }
-    }
-    else {
-      console.log(message);
-    }
-  };
 
-  scope.amdJS = amdJS;
-
+      if (type === 'fail') {
+        pass = false;
+        resolve();
+      }
+    };
+  })();
 })(this);

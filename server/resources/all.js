@@ -3,8 +3,10 @@ document.getElementById('run-tests').onclick = runTests;
 var autoRun = (location.search.indexOf('autorun=true') != -1) ? true : false;
 var groupings = {};
 
-if (implemented) {
-  // tag valid tests as testable
+// tag valid tests as testable
+// we give it a "testable" class. We then add a bunch of
+// pending DIVs until test execution fires
+if (window.implemented) {
   for (impl in implemented) {
     nodes = document.getElementsByClassName(impl);
     for (i = 0, len = nodes.length; i < len; i++) {
@@ -16,11 +18,13 @@ if (implemented) {
   }
 }
 
+// selects a framework
 function selectFramework() {
   var qstr = '?framework=' + document.getElementById('select-framework').value;
   location.href = location.pathname + qstr;
 }
 
+// runs the test collection
 function runTests() {
   document.getElementById('run-tests').disabled = true;
   
@@ -52,71 +56,14 @@ function runTests() {
   }
 }
 
-var amdJS = amdJS || {};
-
-function testAllDone() {
-  var done = true;
-  var failed = false;
-  var groups = 0;
-  var totalGroups = document.getElementsByTagName('iframe').length;
-  for (var name in groupings) {
-    if (groupings.hasOwnProperty(name)) {
-      groups++;
-      if (!groupings[name].done) {
-        done = false;
-      }
-      if (groupings[name].fail > 0) {
-        failed = true;
-      }
-    }
-  }
-
-  if (!done || groups < totalGroups) {
-    return;
-  }
-
-  var out = document.getElementById('results');
-  if (!out) {
-    out = document.createElement('div');
-    out.id = 'results';
-    out.style.visibility = 'hidden';
-    document.body.appendChild(out);
-    console.log('AMDJS ' + ((failed) ? 'FAIL' : 'PASS'));
-  }
-  out.innerHTML = (failed) ? 'FAIL' : 'PASS';
-}
-
-amdJS.print = function(message) {
-  var pieces = message.match(/^(.+?)[\s]+\((.+?)\)(.*)$/) || [];
-  var type = pieces[1].toLowerCase(),
-      group = pieces[2],
-      msg = pieces[3];
-  console.log(message);
-
-  switch (type) {
-    case 'start':
-      groupings[group] = {
-        pass: 0,
-        fail: 0,
-        total: 0,
-        done: false
-      }
-      break;
-    case 'pass':
-      groupings[group].pass++;
-      groupings[group].total++;
-      break;
-    case 'fail':
-      groupings[group].fail++;
-      groupings[group].total++;
-      break;
-    case 'done':
-      groupings[group].done = true;
-      testAllDone();
-      break;
-  }
+// todo: implement these to handle the reporter's explcit AMD signalling
+var amdJSSignal = {
+  pass: function() {},
+  fail: function() {},
+  done: function() {}
 };
 
+// do an autorun if enabled by query string
 if (autoRun) {
   window.setTimeout(function() {
     runTests();

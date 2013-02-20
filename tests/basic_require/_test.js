@@ -1,15 +1,15 @@
-go(     ['require', 'a'],
-function (require) {
-  require(['b', 'c'],
-  function (b,   c) {
+go(["_reporter"], function(amdJS) {
 
-    amdJS.group('basic_require');
-
-    amdJS.assert('a' === require('a').name, 'require a.name');
-    amdJS.assert('b' === b.name, 'b.name');
-    amdJS.assert('c' === c.name, 'c.name');
-    amdJS.assert(/c\/templates\/first\.txt$/.test(c.url), 'c.url property');
-
-    amdJS.done();
+  go(     ['require', 'a'],
+  function (require) {
+    require(['b', 'c'],
+    function (b,   c) {
+      amdJS.assert('a' === require('a').name, 'basic_require: require a.name');
+      amdJS.assert('b' === b.name, 'basic_require: b.name');
+      amdJS.assert('c' === c.name, 'basic_require: c.name');
+      amdJS.assert(/c\/templates\/first\.txt$/.test(c.url), 'basic_require: c.url property');
+      amdJS.print('DONE', 'done');
+    });
   });
+
 });

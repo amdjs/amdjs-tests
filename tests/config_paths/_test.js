@@ -1,22 +1,21 @@
-config({
-  baseUrl: '.',
-  paths: {
-    'foo/b': 'alternate/b',
-    'foo/b/c': 'elsewhere/c'
-  }
-});
+go(["_reporter"], function(amdJS) {
 
-go(     ['foo', 'foo/b', 'foo/b/c', 'bar', 'bar/sub'],
-function (foo,   fooB,    fooC,      bar,   barSub) {
+  config({
+    baseUrl: '.',
+    paths: {
+      'foo/b': 'alternate/b',
+      'foo/b/c': 'elsewhere/c'
+    }
+  });
 
-  amdJS.group('config_paths');
-
-  amdJS.assert('foo' === foo.name, 'foo.name');
-  amdJS.assert('fooB' === fooB.name, 'fooB.name');
-  amdJS.assert('fooC' === fooC.name, 'fooC.name');
-  amdJS.assert('bar' === bar.name, 'bar.name');
-  amdJS.assert('barSub' === barSub.name, 'barSub.name');
-
-  amdJS.done();
+  go(     ['foo', 'foo/b', 'foo/b/c', 'bar', 'bar/sub'],
+  function (foo,   fooB,    fooC,      bar,   barSub) {
+    amdJS.assert('foo' === foo.name, 'config_paths: foo.name');
+    amdJS.assert('fooB' === fooB.name, 'config_paths: fooB.name');
+    amdJS.assert('fooC' === fooC.name, 'config_paths: fooC.name');
+    amdJS.assert('bar' === bar.name, 'config_paths: bar.name');
+    amdJS.assert('barSub' === barSub.name, 'config_paths: barSub.name');
+    amdJS.print('DONE', 'done');
+  });
 
 });
