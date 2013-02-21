@@ -1,0 +1,10 @@
+language: node_js
+node_js:
+  - 0.8
+before_install:
+  - git submodule update --init --recursive
+before_script:
+  - npm install
+  - node server/server.js &
+  - sleep 5
+script: node ./server/phantom-server.js

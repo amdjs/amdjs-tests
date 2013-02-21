@@ -25,8 +25,7 @@
     return exports;
   };
 
-  // define this module both named and anonymous
+  // define this module
   define("_reporter", [], factory);
-  define([], factory);
 
 })();

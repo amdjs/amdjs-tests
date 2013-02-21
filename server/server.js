@@ -4,6 +4,7 @@ var fs = require('fs');
 var express = require('express');
 var manifest = require('./manifest').manifest;
 var app = express();
+var systemNotify = false;
 
 function fourOhFour(res, msg) {
   console.log(msg);
@@ -85,7 +86,10 @@ app.get('/config/:framework', function(req, res) {
 app.get('/:framework/:test/system.js', function(req, res) {
   // get a file for the specified test
   res.setHeader('Content-Type', 'text/javascript');
-  console.log('"system" module requested by browser. Usually a side-effect of doing static analysis');
+  if (!systemNotify) {
+    systemNotify = true;
+    console.log('"system" module requested by browser. Usually a side-effect of doing static analysis');
+  }
   res.end('', 404);
 });
 
