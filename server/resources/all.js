@@ -113,7 +113,6 @@ automatically, again for Travis-CI.
   // window.top.amdJSSignal.*, with pass(), fail(), and done()
   // methods. We use this for travis signalling
   window.amdJSSignal = {
-    pass: function() {},
     fail: function() {
       failed = true;
       travisResult.innerHTML = 'fail';
