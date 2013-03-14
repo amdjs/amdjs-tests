@@ -19,9 +19,9 @@ exports.manifest.inject = {
   config: 'inject/config.js'
 };
 
-// disabled. Circular loop resolution issue
+// disabled, pending lsjs#3
 // exports.manifest.lsjs = {
-//   name:   'lsjs @ e61412da',
+//   name:   'lsjs @ e61412da (mod)',
 //   impl:   'lsjs/lsjs.js',
 //   config: 'lsjs/config.js'
 // };
