@@ -10,13 +10,14 @@ function setModuleRoot() {
 }
 
 Inject.reset();
+Inject.enableAMDPlugins();
+setModuleRoot();
 var config = function(pathObj) {
       for(var key in pathObj.paths) {
         Inject.addRule(key, {path:pathObj.paths[key]});
       }
     },
     go = function() {
-      setModuleRoot();
       Inject.require.apply(this, arguments)
     },
     implemented = {
@@ -24,8 +25,8 @@ var config = function(pathObj) {
         anon: true,
         funcString: true,
         namedWrapped: true,
-        require: true
-        // plugins: true
+        require: true,
+        plugins: true
         // pluginDynamic: true
     };
 require = undefined;
