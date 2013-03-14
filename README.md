@@ -1,5 +1,7 @@
 # AMD Tests
 
+[![Travis CI Status](https://secure.travis-ci.org/amdjs/amdjs-tests.png?branch=master)](http://travis-ci.org/#!/linkedin/inject/branch_summary)
+
 A set of Asynchronous Module Definition
 [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) compliance
 tests.
