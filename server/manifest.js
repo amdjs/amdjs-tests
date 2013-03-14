@@ -6,7 +6,7 @@ exports.manifest = {
     "config": 'requirejs/config.js'
   },
   "needs": {
-    "name":   'Needs JS @ unknown',
+    "name":   'Needs JS @ a915dce3',
     "impl":   'needs/needs.js',
     "config": 'needs/config.js'
   },
