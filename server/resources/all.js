@@ -128,6 +128,8 @@ automatically, again for Travis-CI.
     }
   };
 
+  document.getElementById('run-tests').removeAttribute('disabled');
+
   // do an autorun if enabled by query string
   if (autoRun) {
     window.setTimeout(function() {
