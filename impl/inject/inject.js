@@ -479,276 +479,222 @@ var commonJSFooter = (['',
   '};',
   '']).join('\n');
 
-//     Fiber.js 1.0.5
-//     @author: Kirollos Risk
-//
-//     Copyright (c) 2012 LinkedIn.
-//     All Rights Reserved. Apache Software License 2.0
-//     http://www.apache.org/licenses/LICENSE-2.0
+/*
+Inject
+Copyright 2011 LinkedIn
 
-(function () {
-  /*jshint bitwise: true, camelcase: false, curly: true, eqeqeq: true,
-    forin: false, immed: true, indent: 2, latedef: true, newcap: false,
-    noarg: true, noempty: false, nonew: true, plusplus: false,
-    quotmark: single, regexp: false, undef: true, unused: true, strict: false,
-    trailing: true, asi: false, boss: false, debug: false, eqnull: true,
-    es5: false, esnext: false, evil: true, expr: false, funcscope: false,
-    iterator: false, lastsemic: false, laxbreak: false, laxcomma: false,
-    loopfunc: false, multistr: true, onecase: false, proto: false,
-    regexdash: false, scripturl: false, smarttabs: false, shadow: true,
-    sub: true, supernew: true, validthis: false */
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-  /*global exports, global, define, module */
+    http://www.apache.org/licenses/LICENSE-2.0
 
-  (function (root, factory) {
-    if (typeof exports === 'object') {
-      // Node. Does not work with strict CommonJS, but
-      // only CommonJS-like environments that support module.exports,
-      // like Node.
-      module.exports = factory(this);
-    } else if (typeof define === 'function' && define.amd) {
-      // AMD. Register as an anonymous module.
-      define(function () {
-        return factory(root);
-      });
-    } else {
-      // Browser globals (root is window)
-      root.Fiber = factory(root);
-    }
-  }(this, function (global) {
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an "AS
+IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+express or implied.   See the License for the specific language
+governing permissions and limitations under the License.
+*/
 
-    // Baseline setup
-    // --------------
+// CLASS impl
+/**
+ * Class Inheritance model
+ *
+ * Copyright (c) 2012 LinkedIn.
+ * All Rights Reserved. Apache Software License 2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+( function( window ){
+  // Stores whether the object is being initialized, and thus not
+  // run the <init> function, or not.
+  var initializing = false;
 
-    // Stores whether the object is being initialized. i.e., whether
-    // to run the `init` function, or not.
-    var initializing = false,
-
-    // Keep a few prototype references around - for speed access,
-    // and saving bytes in the minified version.
-    ArrayProto = Array.prototype,
-
-    // Save the previous value of `Fiber`.
-    previousFiber = global.Fiber;
-
-    // Helper function to copy properties from one object to the other.
-    function copy(from, to) {
-      var name;
-      for (name in from) {
-        if (from.hasOwnProperty(name)) {
-          to[name] = from[name];
-        }
+  function copy(from, to) {
+    var name;
+    for( name in from ){
+      if( from.hasOwnProperty( name ) ){
+        to[name] = from[name];
       }
     }
+  }
 
-    // The base `Fiber` implementation.
-    function Fiber() {}
+  // The base Class implementation
+  function Class(){};
 
-    // ###Extend
-    //
-    // Returns a subclass.
-    Fiber.extend = function (fn) {
-      // Keep a reference to the current prototye.
-      var parent = this.prototype,
+  var _Class = window.Class;
+  Class.noConflict = function() {
+    window.Class = _Class;
+    return Class;
+  };
 
-      // Invoke the function which will return an object literal used to
-      // define the prototype. Additionally, pass in the parent prototype,
-      // which will allow instances to use it.
-      properties = fn(parent),
-
-      // Stores the constructor's prototype.
+  // Create a new Class that inherits from this class
+  Class.extend = function( fn ){
+    // Keep a reference to the current prototye
+    var base = this.prototype,
+      // Invoke the function which will return an object literal used to define
+      // the prototype. Additionally, pass in the parent prototype, which will
+      // allow instances to use it
+      properties = fn( base ),
+      // Stores the constructor's prototype
       proto;
 
-      // The constructor function for a subclass.
-      function child() {
-        if (!initializing) {
-          // Custom initialization is done in the `init` method.
-          this.init.apply(this, arguments);
-          // Prevent subsequent calls to `init`. Note: although a `delete
-          // this.init` would remove the `init` function from the instance, it
-          // would still exist in its super class' prototype.  Therefore,
-          // explicitly set `init` to `void 0` to obtain the `undefined`
-          // primitive value (in case the global's `undefined` property has
-          // been re-assigned).
-          this.init = void 0;
+       // The dummy class constructor
+      function constructor(){
+        if( !initializing && typeof this.init === 'function' ){
+          // All construction is done in the init method
+          this.init.apply( this, arguments );
+          // Prevent any re-initializing of the instance
+          this.init = null;
         }
       }
 
-      // Instantiate a base class (but only create the instance, without
-      // running `init`). And, make every `constructor` instance an instance
-      // of `this` and of `constructor`.
+      // Instantiate a base class (but only create the instance, don't run the init function),
+      // and make every <constructor> instance an instanceof <this> and of <constructor>
       initializing = true;
-      proto = child.prototype = new this;
+      proto = constructor.prototype = new this;
       initializing = false;
 
-      // Add default `init` function, which a class may override; it should
-      // call the super class' `init` function (if it exists);
-      proto.init = function () {
-        if (typeof parent.init === 'function') {
-          parent.init.apply(this, arguments);
+       // Copy the properties over onto the new prototype
+      copy( properties, proto );
+
+      // return a proxy object for accessing this as a superclass
+      proto.createSuper = function( subclass ){
+        var props = proto,
+            iface = {},
+            wrap = function(scope, fn) {
+              return function() {
+                return fn.apply(scope, arguments);
+              };
+            };
+        for( name in props ){
+          if( props.hasOwnProperty( name ) ){
+            iface[name] = wrap(subclass, props[name]);
+          }
         }
+        return iface;
       };
 
-       // Copy the properties over onto the new prototype.
-      copy(properties, proto);
-
-      // Enforce the constructor to be what we expect.
-      proto.constructor = child;
+      // Enforce the constructor to be what we expect
+      proto.constructor = constructor;
 
       // Keep a reference to the parent prototype.
-      // (Note: currently used by decorators and mixins, so that the parent
-      // can be inferred).
-      child.__base__ = parent;
+      // This is needed in order to support decorators
+      constructor.__base = base;
 
-      // Make this class extendable, this can be overridden by providing a
-      // custom extend method on the proto.
-      child.extend = child.prototype.extend || Fiber.extend;
+       // Make this class extendable
+      constructor.extend = Class.extend;
 
+      // Add ability to create singleton
+      constructor.singleton = Class.singleton;
 
-      return child;
-    };
+      // ... as well as mixin ability
+      constructor.mixin = function( /* mixin[s] */ ) {
+        var i,
+          len = arguments.length
 
-    // Utilities
-    // ---------
-
-    // ###Proxy
-    //
-    // Returns a proxy object for accessing base methods with a given context.
-    //
-    // - `base`: the instance' parent class prototype.
-    // - `instance`: a Fiber class instance.
-    //
-    // Overloads:
-    //
-    // - `Fiber.proxy( instance )`
-    // - `Fiber.proxy( base, instance )`
-    //
-    Fiber.proxy = function (base, instance) {
-      var name,
-        iface = {},
-        wrap;
-
-      // If there's only 1 argument specified, then it is the instance,
-      // thus infer `base` from its constructor.
-      if (arguments.length === 1) {
-        instance = base;
-        base = instance.constructor.__base__;
-      }
-
-      // Returns a function which calls another function with `instance` as
-      // the context.
-      wrap = function (fn) {
-        return function () {
-          return base[fn].apply(instance, arguments);
-        };
-      };
-
-      // For each function in `base`, create a wrapped version.
-      for (name in base) {
-        if (base.hasOwnProperty(name) && typeof base[name] === 'function') {
-          iface[name] = wrap(name);
+        for( i = 0; i < len; i++ ){
+          copy( arguments[i]( base ), proto );
         }
       }
-      return iface;
-    };
 
-    // ###Decorate
-    //
-    // Decorate an instance with given decorator(s).
-    //
-    // - `instance`: a Fiber class instance.
-    // - `decorator[s]`: the argument list of decorator functions.
-    //
-    // Note: when a decorator is executed, the argument passed in is the super
-    // class' prototype, and the context (i.e. the `this` binding) is the
-    // instance.
-    //
-    //  *Example usage:*
-    //
-    //     function Decorator( base ) {
-    //       // this === obj
-    //       return {
-    //         greet: function() {
-    //           console.log('hi!');
-    //         }
-    //       };
-    //     }
-    //
-    //     var obj = new Bar(); // Some instance of a Fiber class
-    //     Fiber.decorate(obj, Decorator);
-    //     obj.greet(); // hi!
-    //
-    Fiber.decorate = function (instance /*, decorator[s] */) {
-      var i,
-        // Get the base prototype.
-        base = instance.constructor.__base__,
-        // Get all the decorators in the arguments.
-        decorators = ArrayProto.slice.call(arguments, 1),
-        len = decorators.length;
+      return constructor;
+  };
 
-      for (i = 0; i < len; i++) {
-        copy(decorators[i].call(instance, base), instance);
+  // Returns a proxy object for accessing base methods
+  // with a given context
+  Class.proxy = function( base, instance ) {
+    var name,
+        iface = {},
+        wrap = function( fn ) {
+          return function() {
+            return base[fn].apply( instance, arguments );
+          };
+        };
+
+    // Create a wrapped method for each method in the base
+    // prototype
+    for( name in base ){
+      if( base.hasOwnProperty( name ) && typeof base[name] === 'function' ){
+        iface[name] = wrap( name );
       }
-    };
+    }
+    return iface;
+  }
 
-    // ###Mixin
-    //
-    // Add functionality to a Fiber definition
-    //
-    // - `definition`: a Fiber class definition.
-    // - `mixin[s]`: the argument list of mixins.
-    //
-    // Note: when a mixing is executed, the argument passed in is the super
-    // class' prototype (i.e., the base)
-    //
-    // Overloads:
-    //
-    // - `Fiber.mixin( definition, mix_1 )`
-    // - `Fiber.mixin( definition, mix_1, ..., mix_n )`
-    //
-    // *Example usage:*
-    //
-    //     var Definition = Fiber.extend(function(base) {
-    //       return {
-    //         method1: function(){}
-    //       }
-    //     });
-    //
-    //     function Mixin(base) {
-    //       return {
-    //         method2: function(){}
-    //       }
-    //     }
-    //
-    //     Fiber.mixin(Definition, Mixin);
-    //     var obj = new Definition();
-    //     obj.method2();
-    //
-    Fiber.mixin = function (definition /*, mixin[s] */) {
-      var i,
-        // Get the base prototype.
-        base = definition.__base__,
-        // Get all the mixins in the arguments.
-        mixins = ArrayProto.slice.call(arguments, 1),
-        len = mixins.length;
+  // Decorates an instance
+  Class.decorate = function( instance /*, decorator[s]*/ ) {
+    var i,
+      len = arguments.length,
+      base = instance.constructor.__base;
 
-      for (i = 0; i < len; i++) {
-        copy(mixins[i](base), definition.prototype);
+    for( i = 1; i < len; i++ ){
+      arguments[i].call( instance, base );
+    }
+  }
+
+  // Return a singleton
+  Class.singleton = function( fn ) {
+    var obj = this.extend( fn ),
+      args = arguments;
+
+    return (function() {
+      var instance;
+
+      return {
+        getInstance: function() {
+          var temp;
+
+          // Create an instance, if it does not exist
+          if ( !instance ) {
+
+            // If there are additional arguments specified, they need to be
+            // passed into the constructor.
+            if ( args.length > 1 ) {
+              // temporary constructor
+              temp = function(){};
+              temp.prototype = obj.prototype;
+
+              instance = new temp;
+
+              // call the original constructor with 'instance' as the context
+              // and the rest of the arguments
+              obj.prototype.constructor.apply( instance, Array.prototype.slice.call( args, 1 ) );
+
+            } else {
+              instance = new obj();
+            }
+
+          }
+
+          return instance;
+        }
       }
-    };
+    })();
+  }
 
-    // ###noConflict
-    //
-    // Run Fiber.js in *noConflict* mode, returning the `fiber` variable to
-    // its previous owner. Returns a reference to the Fiber object.
-    Fiber.noConflict = function () {
-      global.Fiber = previousFiber;
-      return Fiber;
-    };
+   //Export to Common JS Loader
+  if( typeof module !== 'undefined' && typeof module !== 'function' ){
+    if( typeof module.setExports === 'function' ){
+      module.setExports( Class );
+    } else if( module.exports ){
+      module.exports = Class;
+    }
+  } else {
+    window.Class = Class;
+  }
 
-    return Fiber;
-  }));
-} ());
+}( window ) );
 /*jshint multistr:true */
 
 // this file has been modified from its original source
@@ -2217,11 +2163,11 @@ Test the schema version inside of lscache, and if it has changed, flush the cach
 })();
 
 /**
-    Fiber.js instance
+    Class.js instance
     @type {object}
     @global
  */
-var Fiber = this.Fiber.noConflict();
+var Class = this.Class.noConflict();
 /*
 Inject
 Copyright 2011 LinkedIn
@@ -2247,7 +2193,7 @@ governing permissions and limitations under the License.
 **/
 var Analyzer;
 (function () {
-  var AsStatic = Fiber.extend(function () {
+  var AsStatic = Class.extend(function () {
     return {
       /**
        * analyzer initialization
@@ -2320,7 +2266,7 @@ governing permissions and limitations under the License.
 **/
 var Communicator;
 (function () {
-  var AsStatic = Fiber.extend(function () {
+  var AsStatic = Class.extend(function () {
     var pauseRequired = false;
 
     var socketConnectionQueue;
@@ -2860,7 +2806,7 @@ var Executor;
     return result;
   }
 
-  var AsStatic = Fiber.extend(function () {
+  var AsStatic = Class.extend(function () {
     var functionCount = 0;
     return {
       /**
@@ -3208,7 +3154,7 @@ governing permissions and limitations under the License.
 **/
 var InjectCore;
 (function () {
-  var AsStatic = Fiber.extend(function () {
+  var AsStatic = Class.extend(function () {
     return {
       /**
        * The InjectCore object is meant to be instantiated once, and have its
@@ -3409,7 +3355,7 @@ governing permissions and limitations under the License.
  * run (require.run), and define.
  * @file
 **/
-var RequireContext = Fiber.extend(function () {
+var RequireContext = Class.extend(function () {
   return {
     /**
      * Creates a new RequireContext
@@ -3835,7 +3781,7 @@ var RulesEngine;
     return fn.toString().replace(FUNCTION_BODY_REGEX, '$1');
   }
 
-  var AsStatic = Fiber.extend(function () {
+  var AsStatic = Class.extend(function () {
     return {
       /**
        * Create a RulesEngine Object
@@ -4241,7 +4187,7 @@ governing permissions and limitations under the License.
  * as downloaded.
  * @file
 **/
-var TreeDownloader = Fiber.extend(function () {
+var TreeDownloader = Class.extend(function () {
   return {
     /**
      * Create a TreeDownloader with a root node. From this node,
@@ -4543,7 +4489,7 @@ governing permissions and limitations under the License.
  * via various traversal methods.
  * @file
 **/
-var TreeNode = Fiber.extend(function () {
+var TreeNode = Class.extend(function () {
   return {
     /**
      * Create a TreeNode with a defined value
@@ -4984,5 +4930,5 @@ context.require = context.Inject.INTERNAL.createRequire();
     @public
  */
 context.define = context.Inject.INTERNAL.createDefine();
-context.Inject.version = "0.4.0rc4-88-g6a52823";
+context.Inject.version = "0.4.1";
 })(this);

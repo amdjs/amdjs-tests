@@ -11,7 +11,7 @@ exports.manifest = {
     "config": 'needs/config.js'
   },
   "inject": {
-    "name":   'Inject',
+    "name":   'Inject 0.4.1',
     "impl":   'inject/inject.js',
     "config": 'inject/config.js'
   },

@@ -17,6 +17,7 @@ var config = function(pathObj) {
     },
     go = function() {
       setModuleRoot();
+      Inject.enableAMDPlugins();
       Inject.require.apply(this, arguments)
     },
     implemented = {
@@ -24,8 +25,8 @@ var config = function(pathObj) {
         anon: true,
         funcString: true,
         namedWrapped: true,
-        require: true
-        // plugins: true
+        require: true,
+        plugins: true
         // pluginDynamic: true
     };
 require = undefined;
