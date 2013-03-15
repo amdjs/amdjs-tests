@@ -1,6 +1,6 @@
-go(["_reporter"], function(amdJS) {
+go(["_reporter", "require"], function(amdJS, require) {
 
-  go(     ['refine!a'],
+  require(['refine!a'],
   function (a) {
     amdJS.assert('a' === a.name, 'plugin_fromtext: a.name');
     amdJS.print('DONE', 'done');

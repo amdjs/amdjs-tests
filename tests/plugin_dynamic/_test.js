@@ -1,6 +1,6 @@
-go(["_reporter"], function(amdJS) {
+go(["_reporter", "require"], function(amdJS, require) {
 
-  go(     ['pillow', 'sub/blanket'],
+  require(['pillow', 'sub/blanket'],
   function (pillow,   blanket) {
     pillow.delayed(function (resource) {
       amdJS.assert(resource !== pillow.resource, 'plugin_dynamic: resource and pillow.resource should have different names');

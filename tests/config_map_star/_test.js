@@ -1,4 +1,4 @@
-go(["_reporter"], function(amdJS) {
+go(["_reporter", "require"], function(amdJS, require) {
 
   config({
     baseUrl: './',
@@ -19,8 +19,8 @@ go(["_reporter"], function(amdJS) {
       }
     }
   });
-  go(    ['a', 'b', 'c', 'a/sub/one'],
-  function(a,   b,   c,   one) {
+  require(['a', 'b', 'c', 'a/sub/one'],
+  function (a,   b,   c,   one) {
     amdJS.assert('c1' === a.c.name, 'config_map_star: a.c.name');
     amdJS.assert('c1/sub' === a.csub.name, 'config_map_star: a.csub.name');
     amdJS.assert('c2' === one.c.name, 'config_map_star: one.c.name');

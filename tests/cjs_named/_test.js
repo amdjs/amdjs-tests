@@ -1,6 +1,6 @@
-go(["_reporter"], function(amdJS) {
+go(["_reporter", "require"], function(amdJS, require) {
 
-  go(     ['car'],
+  require(['car'],
   function (car) {
     amdJS.assert('car' === car.name, 'cjs_named: car.name');
     amdJS.assert('wheels' === car.wheels.name, 'cjs_named: car.wheels.name');

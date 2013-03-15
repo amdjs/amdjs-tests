@@ -1,6 +1,6 @@
-go(["_reporter"], function(amdJS) {
+go(["_reporter", "require"], function(amdJS, require) {
 
-  go(     ['a', 'b'],
+  require(['a', 'b'],
   function (a,   b) {
     amdJS.assert('a' === a.name, 'basic_simple: a.name');
     amdJS.assert('b' === b.name, 'basic_simple: b.name');

@@ -19,9 +19,8 @@ exports.manifest.inject = {
   config: 'inject/config.js'
 };
 
-// disabled, pending lsjs#3
-// exports.manifest.lsjs = {
-//   name:   'lsjs @ e61412da (mod)',
-//   impl:   'lsjs/lsjs.js',
-//   config: 'lsjs/config.js'
-// };
+exports.manifest.lsjs = {
+  name:   'lsjs @ e61412da',
+  impl:   'lsjs/lsjs.js',
+  config: 'lsjs/config.js'
+};

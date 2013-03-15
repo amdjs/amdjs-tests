@@ -1,4 +1,4 @@
-go(["_reporter"], function(amdJS) {
+go(["_reporter", "require"], function(amdJS, require) {
   var count = 0;
   var timeout = 10000;
 
@@ -16,14 +16,14 @@ go(["_reporter"], function(amdJS) {
     }
   };
 
-  go(     ['double!foo'],
+  require(['double!foo'],
   function (foo) {
     if (foo === 'x') {
       done();
     }
   });
 
-  go(     ['double!foo'],
+  require(['double!foo'],
   function (foo) {
     if (foo === 'x') {
       done();

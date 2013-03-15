@@ -1,6 +1,6 @@
-go(["_reporter"], function(amdJS) {
+go(["_reporter", "require"], function(amdJS, require) {
 
-  go(     ['require', 'earth', 'prime/earth'],
+  require(['require', 'earth', 'prime/earth'],
   function (require,   earth,   primeEarth) {
     amdJS.assert('a' === earth.getA().name, 'plugin_normalize: earth.getA().name');
     amdJS.assert('c' === earth.getC().name, 'plugin_normalize: earth.getC().name');

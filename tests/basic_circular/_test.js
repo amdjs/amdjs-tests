@@ -1,7 +1,7 @@
-go(["_reporter"], function(amdJS) {
+go(["_reporter", "require"], function(amdJS, require) {
 
-  go(    ["require", "two", "funcTwo", "funcThree"],
-  function(require,   two,   funcTwo,   funcThree) {
+  require(["require", "two", "funcTwo", "funcThree"],
+  function (require,   two,   funcTwo,   funcThree) {
     var args = two.doSomething(),
         twoInst = new funcTwo("TWO"),
         oneMod = two.getOneModule();

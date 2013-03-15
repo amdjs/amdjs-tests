@@ -1,4 +1,4 @@
-go(["_reporter"], function(amdJS) {
+go(["_reporter", "require"], function(amdJS, require) {
 
   config({
     baseUrl: './',
@@ -12,8 +12,8 @@ go(["_reporter"], function(amdJS) {
     }
   });
 
-  go(    ['e', 'adapter/d'],
-  function(e,   adapterD) {
+  require(['e', 'adapter/d'],
+  function (e,   adapterD) {
     'use strict';
     amdJS.assert('e' === e.name, 'config_map_star_adapter: e.name');
     amdJS.assert('d' === e.d.name, 'config_map_star_adapter: e.d.name');

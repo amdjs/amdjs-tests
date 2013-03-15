@@ -1,4 +1,4 @@
-go(["_reporter"], function(amdJS) {
+go(["_reporter", "require"], function(amdJS, require) {
 
   config({
     baseUrl: './',
@@ -35,8 +35,8 @@ go(["_reporter"], function(amdJS) {
     }
   });
 
-  go(    ['a', 'c', 'e', 'f'],
-  function(a,   c,   e,   f) {
+  require(['a', 'c', 'e', 'f'],
+  function (a,   c,   e,   f) {
     amdJS.assert('a' === a, 'config_shim: a');
     amdJS.assert('a' === window.globalA, 'config_shim: window.globalA');
     amdJS.assert('a' === c.b.aValue, 'config_shim: c.b.aValue');

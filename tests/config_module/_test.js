@@ -1,4 +1,4 @@
-go(["_reporter"], function(amdJS) {
+go(["_reporter", "require"], function(amdJS, require) {
 
   config({
     baseUrl: './',
@@ -12,8 +12,8 @@ go(["_reporter"], function(amdJS) {
     }
   });
 
-  go(    ['a', 'b/c', 'plain'],
-  function(a,   c,     plain) {
+  require(['a', 'b/c', 'plain'],
+  function (a,   c,     plain) {
     amdJS.assert('magic' === a.type, 'config_module: a.type is magic');
     amdJS.assert('beans' === c.food, 'config_module: c.food is beans');
     amdJS.assert('plain' === plain.id, 'config_module: module.id is defined');

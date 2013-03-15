@@ -1,4 +1,4 @@
-go(["_reporter"], function(amdJS) {
+go(["_reporter", "require"], function(amdJS, require) {
 
   config({
     baseUrl: '.',
@@ -8,7 +8,7 @@ go(["_reporter"], function(amdJS) {
     }
   });
 
-  go(     ['foo', 'foo/b', 'foo/b/c', 'bar', 'bar/sub'],
+  require(['foo', 'foo/b', 'foo/b/c', 'bar', 'bar/sub'],
   function (foo,   fooB,    fooC,      bar,   barSub) {
     amdJS.assert('foo' === foo.name, 'config_paths: foo.name');
     amdJS.assert('fooB' === fooB.name, 'config_paths: fooB.name');

@@ -1,6 +1,6 @@
-go(["_reporter"], function(amdJS) {
+go(["_reporter", "require"], function(amdJS, require) {
 
-  go(     ['one', 'two', 'three'],
+  require(['one', 'two', 'three'],
   function (one,   two,   three) {
 
     var args = two.doSomething(),

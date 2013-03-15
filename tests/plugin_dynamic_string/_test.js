@@ -1,6 +1,6 @@
-go(["_reporter"], function(amdJS) {
+go(["_reporter", "require"], function(amdJS, require) {
 
-  go(     ['mattress'],
+  require(['mattress'],
   function (mattress) {
     //Make sure the resource names do not match for the
     //three kinds of pillow-related resources.
