@@ -48,14 +48,26 @@ config({
   ]
 });
 
-go(["_reporter", "require"], function(amdJS, require) {
-
-  require(["require", "alpha", "alpha/replace", "beta", "beta/util", "bar", "baz",
-           "foo", "foo/second", "dojox/chair", "dojox/table", "dojox/door",
-           "dojox/window/pane", "dojox/window", "dojox/table/legs", "funky"],
-  function (require,   alpha,   replace,         beta,   util,        bar,   baz,
-            foo,   second,       chair,          table,        door,
-            pane,                window,         legs,               funky) {
+go([
+  "_reporter",
+  "require",
+  "alpha",
+  "alpha/replace",
+  "beta",
+  "beta/util",
+  "bar",
+  "baz",
+  "foo",
+  "foo/second",
+  "dojox/chair",
+  "dojox/table",
+  "dojox/door",
+  "dojox/window/pane",
+  "dojox/window",
+  "dojox/table/legs",
+  "funky"],
+  function (amdJS, require, alpha, replace, beta, util, bar, baz, foo, second,
+    chair, table, door, pane, window, legs, funky) {
 
     amdJS.assert('alpha' === alpha.name, 'config_packages: alpha.name');
     amdJS.assert('fake/alpha/replace' === replace.name, 'config_packages: replace.name');
@@ -82,6 +94,5 @@ go(["_reporter", "require"], function(amdJS, require) {
     amdJS.assert('funky' === funky.name, 'config_packages: funky.name');
     amdJS.assert('monkey' === funky.monkeyName, 'config_packages: funky.monkeyName');
     amdJS.print('DONE', 'done');
-  });
-
-});
+  }
+);

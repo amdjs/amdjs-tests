@@ -13,39 +13,43 @@
 (function(scope) {
   // load me after your AMD implementation that provides
   // "go", "config", and "implemented"
-  (function() {
-    var oldGo = window.go;
-    var stopStack = [];
-    var pass = true;
+  window.setTimeout(function() {
+    document.body.style.backgroundColor = 'gray';
+  }, 0);
 
-    // resolve the test to a background color
-    var resolve = function() {
-      document.body.style.backgroundColor = (pass) ? 'green' : 'red';
-    };
+  var oldGo = window.go;
+  var stopStack = [];
+  var pass = true;
 
-    // override go() with a start/stop timer
-    window.go = function () {
-      var newArgs = [].splice.call(arguments, 0);
-      var fn = newArgs[newArgs.length - 1];
+  // resolve the tests to a background color
+  var resolve = function() {
+    var color = 'gray';
+    // empty stack or failing tests resolve immediately
+    if (stopStack.length === 0 || !pass) {
+      color = (pass) ? 'green' : 'red';
+    }
+    document.body.style.backgroundColor = color;
+  };
 
-      stopStack.push(window.setTimeout(function() {
-        window.amdJSPrint('Test timed out: ' + newArgs.join(';'), 'fail');
-      }, 3000));
-      newArgs[newArgs.length - 1] = function () {
-        fn.apply(undefined, arguments);
-        window.clearTimeout(stopStack.pop());
-        resolve();
-      };
+  // override go() with a start/stop timer
+  window.go = function () {
+    var newArgs = [].splice.call(arguments, 0);
+    var fn = newArgs[newArgs.length - 1];
 
-      oldGo.apply(window, newArgs);
-    };
+    stopStack.push(window.setTimeout(function() {
+      window.amdJSPrint('Test timed out: ' + newArgs.join(';'), 'fail');
+    }, 3000));
 
-    // print causes a console log event
-    // on first fail, we flag as red
-    window.amdJSPrint = function (message, type) {
-      var fullMessage = type + '    ' + message;
-      window.top.console.log(fullMessage);
+    oldGo.apply(oldGo, newArgs);
+  };
 
+  // print causes a console log event
+  // on first fail, we flag as red
+  window.amdJSPrint = function (message, type) {
+    var fullMessage = type + '    ' + message;
+    window.top.console.log(fullMessage);
+
+    try {
       if (window.top.amdJSSignal) {
         if (type === 'fail') {
           window.top.amdJSSignal.fail(message);
@@ -54,11 +58,17 @@
           window.top.amdJSSignal.done();
         }
       }
+    }
+    catch (e) {}
 
-      if (type === 'fail') {
-        pass = false;
-        resolve();
-      }
-    };
-  })();
+    if (type === 'fail') {
+      pass = false;
+      resolve();
+    }
+
+    if (type === 'done') {
+      window.clearTimeout(stopStack.pop());
+      resolve();
+    }
+  };
 })(this);
