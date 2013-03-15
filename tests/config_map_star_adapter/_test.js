@@ -1,16 +1,16 @@
-go(["_reporter", "require"], function(amdJS, require) {
-
-  config({
-    baseUrl: './',
-    map: {
-      '*': {
-        'd': 'adapter/d'
-      },
-      'adapter/d': {
-        d: 'd'
-      }
+config({
+  baseUrl: './',
+  map: {
+    '*': {
+      'd': 'adapter/d'
+    },
+    'adapter/d': {
+      d: 'd'
     }
-  });
+  }
+});
+
+go(["_reporter", "require"], function(amdJS, require) {
 
   require(['e', 'adapter/d'],
   function (e,   adapterD) {

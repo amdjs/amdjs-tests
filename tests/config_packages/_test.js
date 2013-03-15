@@ -1,54 +1,54 @@
-go(["_reporter", "require"], function(amdJS, require) {
-
-  config({
-    baseUrl: './',
-    paths: {
-      'alpha/replace' : 'replace'
+config({
+  baseUrl: './',
+  paths: {
+    'alpha/replace' : 'replace'
+  },
+  packages: [
+    {
+      name: 'alpha',
+      location: 'pkgs/alpha'
     },
-    packages: [
-      {
-        name: 'alpha',
-        location: 'pkgs/alpha'
-      },
-      {
-        name: 'beta',
-        location: 'pkgs/beta/0.2/scripts',
-        main: 'beta'
-      },
-      {
-        name: 'dojox/chair',
-        location: 'pkgs/dojox/chair'
-      },
-      {
-        name: 'dojox/table',
-        location: 'pkgs/dojox/table',
-        main: 'table'
-      },
-      {
-        name: 'bar',
-        location: 'bar/0.4',
-        main: 'scripts/main'
-      },
-      {
-        name: 'foo',
-        location: 'foo/lib'
-      },
-      {
-        name: 'funky',
-        main: 'index.js'
-      },
-      {
-        name: 'baz',
-        location: 'baz/lib',
-        main: 'index'
-      },
-      {
-        name: 'dojox/window',
-        location: 'dojox/window',
-        main: 'window'
-      }
-    ]
-  });
+    {
+      name: 'beta',
+      location: 'pkgs/beta/0.2/scripts',
+      main: 'beta'
+    },
+    {
+      name: 'dojox/chair',
+      location: 'pkgs/dojox/chair'
+    },
+    {
+      name: 'dojox/table',
+      location: 'pkgs/dojox/table',
+      main: 'table'
+    },
+    {
+      name: 'bar',
+      location: 'bar/0.4',
+      main: 'scripts/main'
+    },
+    {
+      name: 'foo',
+      location: 'foo/lib'
+    },
+    {
+      name: 'funky',
+      main: 'index.js'
+    },
+    {
+      name: 'baz',
+      location: 'baz/lib',
+      main: 'index'
+    },
+    {
+      name: 'dojox/window',
+      location: 'dojox/window',
+      main: 'window'
+    }
+  ]
+});
+
+go(["_reporter", "require"], function(amdJS, require) {
 
   require(["require", "alpha", "alpha/replace", "beta", "beta/util", "bar", "baz",
            "foo", "foo/second", "dojox/chair", "dojox/table", "dojox/door",

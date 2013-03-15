@@ -1,24 +1,25 @@
+config({
+  baseUrl: './',
+  paths: {
+    a: 'a1'
+  },
+
+  map: {
+    '*': {
+      'c': 'another/c'
+    },
+    'a': {
+      c: 'c1'
+    },
+    'a/sub/one': {
+      'c': 'c2',
+      'c/sub': 'another/c/sub'
+    }
+  }
+});
+
 go(["_reporter", "require"], function(amdJS, require) {
 
-  config({
-    baseUrl: './',
-    paths: {
-      a: 'a1'
-    },
-
-    map: {
-      '*': {
-        'c': 'another/c'
-      },
-      'a': {
-        c: 'c1'
-      },
-      'a/sub/one': {
-        'c': 'c2',
-        'c/sub': 'another/c/sub'
-      }
-    }
-  });
   require(['a', 'b', 'c', 'a/sub/one'],
   function (a,   b,   c,   one) {
     amdJS.assert('c1' === a.c.name, 'config_map_star: a.c.name');

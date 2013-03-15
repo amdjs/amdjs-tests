@@ -1,16 +1,16 @@
-go(["_reporter", "require"], function(amdJS, require) {
-
-  config({
-    baseUrl: './',
-    config: {
-      a: {
-        id: 'magic'
-      },
-      'b/c': {
-        id: 'beans'
-      }
+config({
+  baseUrl: './',
+  config: {
+    a: {
+      id: 'magic'
+    },
+    'b/c': {
+      id: 'beans'
     }
-  });
+  }
+});
+
+go(["_reporter", "require"], function(amdJS, require) {
 
   require(['a', 'b/c', 'plain'],
   function (a,   c,     plain) {

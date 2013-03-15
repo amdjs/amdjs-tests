@@ -1,12 +1,12 @@
-go(["_reporter", "require"], function(amdJS, require) {
+config({
+  baseUrl: '.',
+  paths: {
+    'foo/b': 'alternate/b',
+    'foo/b/c': 'elsewhere/c'
+  }
+});
 
-  config({
-    baseUrl: '.',
-    paths: {
-      'foo/b': 'alternate/b',
-      'foo/b/c': 'elsewhere/c'
-    }
-  });
+go(["_reporter", "require"], function(amdJS, require) {
 
   require(['foo', 'foo/b', 'foo/b/c', 'bar', 'bar/sub'],
   function (foo,   fooB,    fooC,      bar,   barSub) {

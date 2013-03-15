@@ -1,19 +1,19 @@
-go(["_reporter", "require"], function(amdJS, require) {
-
-  config({
-    baseUrl: './',
-    paths: {
-      a: 'a1'
+config({
+  baseUrl: './',
+  paths: {
+    a: 'a1'
+  },
+  map: {
+    'a': {
+      c: 'c1'
     },
-    map: {
-      'a': {
-        c: 'c1'
-      },
-      'a/sub/one': {
-        'c': 'c2'
-      }
+    'a/sub/one': {
+      'c': 'c2'
     }
-  });
+  }
+});
+
+go(["_reporter", "require"], function(amdJS, require) {
 
   require(['a', 'b', 'c', 'a/sub/one'],
   function (a,   b,   c,   one) {
