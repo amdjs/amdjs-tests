@@ -15,7 +15,6 @@ go = function () {};
 // comment out the tests you don't need
 implemented = {
   basic: true,
-  basicEmpty: true,
   anon: true,
   funcString: true,
   namedWrapped: true,
