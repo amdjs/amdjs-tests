@@ -22,7 +22,6 @@ var config = function(pathObj) {
     },
     implemented = {
         basic: true,
-        basicEmpty: true,
         anon: true,
         funcString: true,
         namedWrapped: true,
