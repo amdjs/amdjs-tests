@@ -9,12 +9,13 @@ localStorage.clear();
 var config = lsjs,
     go = lsjs,
     implemented = {
-		basic: true,
-		anon: true,
-		funcString: true,
-        namedWrapped: true,
-		require: true,
-		plugins: true
-		//pluginDynamic: true
+      // SEE: tests/basic_empty_deps
+      // basic: true,
+      anon: true,
+      funcString: true,
+      namedWrapped: true,
+      require: true,
+      plugins: true
+      //pluginDynamic: true
     };
 require = undefined;
