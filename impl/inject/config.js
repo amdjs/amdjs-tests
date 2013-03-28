@@ -26,7 +26,7 @@ var config = function(pathObj) {
         funcString: true,
         namedWrapped: true,
         require: true,
-        plugins: true
-        // pluginDynamic: true
+        plugins: true,
+        pathsConfig: true
     };
 require = undefined;
