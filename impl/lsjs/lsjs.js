@@ -527,6 +527,9 @@ var define;
 			factory = dependencies;
 			dependencies = [];
 		}
+		if (!modules[id]) {
+			modules[id] = {id: id, exports: {}};
+		}
 		if (isFunction(factory)) {
 			if (simpleCJS) {
 				factory.toString().replace(commentRegExp, "").replace(cjsRequireRegExp, function (match, dep) {
@@ -534,6 +537,21 @@ var define;
 				});
 			}
 			modules[id].factory = factory;
+			var ret;
+			if (simpleCJS && dependencies.length < 1) {
+				modules[id].cjsreq = _createRequire(id);
+				ret = factory(modules[id].cjsreq, modules[id].exports, modules[id]);
+				if (ret) {
+					modules[id].exports = ret;
+				}
+				modules[id].loaded = true;
+			} else if (dependencies.length < 1) {
+				ret = factory();
+				if (ret) {
+					modules[id].exports = ret;
+				}
+				modules[id].loaded = true;
+			}
 		} else {
 			modules[id].literal = factory;
 		}

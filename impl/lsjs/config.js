@@ -9,8 +9,7 @@ localStorage.clear();
 var config = lsjs,
     go = lsjs,
     implemented = {
-      // SEE: tests/basic_empty_deps
-      // basic: true,
+      basic: true,
       anon: true,
       funcString: true,
       namedWrapped: true,
