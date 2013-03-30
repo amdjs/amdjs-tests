@@ -528,7 +528,11 @@ var define;
 			dependencies = [];
 		}
 		if (!modules[id]) {
-			modules[id] = {id: id, exports: {}};
+			var args = [];
+			if (!simpleCJS) {
+				args= undefined;
+			}
+			modules[id] = {id: id, exports: {}, cjsreq: _createRequire(id), args: args};
 		}
 		if (isFunction(factory)) {
 			if (simpleCJS) {
@@ -537,21 +541,6 @@ var define;
 				});
 			}
 			modules[id].factory = factory;
-			var ret;
-			if (simpleCJS && dependencies.length < 1) {
-				modules[id].cjsreq = _createRequire(id);
-				ret = factory(modules[id].cjsreq, modules[id].exports, modules[id]);
-				if (ret) {
-					modules[id].exports = ret;
-				}
-				modules[id].loaded = true;
-			} else if (dependencies.length < 1) {
-				ret = factory();
-				if (ret) {
-					modules[id].exports = ret;
-				}
-				modules[id].loaded = true;
-			}
 		} else {
 			modules[id].literal = factory;
 		}
@@ -800,7 +789,7 @@ var define;
 			if (mid !== "require") {
 				if (m.loaded !== true && isComplete(m)) {
 					if (m.factory !== undefined) {
-						if (m.args.length < 1) {
+						if (m.args && m.args.length < 1) {
 							m.args = m.args.concat(m.cjsreq, m.exports, m);
 						}
 						var ret = m.factory.apply(null, m.args);
