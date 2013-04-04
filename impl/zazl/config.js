@@ -12,7 +12,7 @@ var go = function(dependencies, callback) {
 	pathname = pathname.substring(0, pathname.lastIndexOf('/')) + "/./";
 	cfg.baseUrl = pathname;
 	cfg.directInject = true;
-	cfg.injectUrl = "/_javascript";
+	cfg.injectUrl = "/zazl/_javascript";
 	cfg.scanCJSRequires = true;
 	zazl(cfg, dependencies, callback);
 };

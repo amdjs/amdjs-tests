@@ -6,7 +6,7 @@ var util = require('util');
 function startZazl(zazloptimizer, app) {
 	var testsdir = fs.realpathSync(path.join(__dirname, "../../tests"));
 	var optimizer = zazloptimizer.createConnectOptimizer(testsdir, false);
-	app.use("/_javascript", optimizer);
+	app.use("/zazl/_javascript", optimizer);
 	app.get('/framework/zazl.js', function(req, res) {
 	  	fs.readFile(zazloptimizer.getLoaderDir()+"/loader/amd/zazl.js", function(err, data) {
 			res.setHeader('Content-Type', 'text/javascript');
