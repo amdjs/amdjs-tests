@@ -26,7 +26,7 @@ exports.manifest.lsjs = {
 };
 
 exports.manifest.zazl = {
-  name:   'zazl @ 1.0.3',
+  name:   'zazl @ 1.0.4',
   impl:   'zazl/zazl.js',
   config: 'zazl/config.js',
   installer: '../impl/zazl/installer'
