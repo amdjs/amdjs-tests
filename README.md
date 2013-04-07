@@ -28,6 +28,7 @@ An implementation needs to have the following two files in the **impl** director
 
 * AMD loader implementation
 * configure script
+* optional installer script (for use if loader provides a Node.js server-side component. see impl/zazl for an example)
 
 The configure script should define the following global variables:
 

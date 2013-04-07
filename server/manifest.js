@@ -24,3 +24,10 @@ exports.manifest.lsjs = {
   impl:   'lsjs/lsjs.js',
   config: 'lsjs/config.js'
 };
+
+exports.manifest.zazl = {
+  name:   'zazl @ 1.0.4',
+  impl:   'zazl/zazl.js',
+  config: 'zazl/config.js',
+  installer: '../impl/zazl/installer'
+};
