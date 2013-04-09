@@ -6,5 +6,4 @@ before_install:
 before_script:
   - npm install
   - node server/server.js &
-  - sleep 20
-script: node ./server/phantom-server.js
+script: node ./server/server_wait.js && node ./server/phantom-server.js
