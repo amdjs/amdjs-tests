@@ -2,7 +2,7 @@
 exports.manifest = {};
 
 exports.manifest.requirejs = {
-  name:   'RequireJS @ 2.1.5',
+  name:   'RequireJS @ 2.1.8',
   impl:   'requirejs/require.js',
   config: 'requirejs/config.js'
 };
