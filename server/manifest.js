@@ -31,3 +31,11 @@ exports.manifest.zazl = {
   config: 'zazl/config.js',
   installer: '../impl/zazl/installer'
 };
+
+exports.manifest.esl = {
+  name:   'esl @ 1.8.4',
+  impl:   'esl/esl.js',
+  config: 'esl/config.js'
+};
+
+
